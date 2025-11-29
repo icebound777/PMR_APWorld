@@ -4,7 +4,6 @@ import pkgutil
 import bsdiff4
 
 from . import PMItem
-from .calculate_crc import recalculate_crcs
 from .RomTable import RomTable
 import os
 
@@ -27,10 +26,53 @@ from .Locations import PMLocation
 from .modules.random_shop_prices import get_shop_price
 from .modules.random_stat_distribution import generate_random_stats
 from .modules.modify_game_strings import multiworld_item_info_to_pmString
-from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
+from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes, APPatchExtension
 from settings import get_settings
 
 FILENAME_PMR_TOKEN_BINARY: str = "pmr_token_data.bin"
+
+class PaperMarioPatchExtensions(APPatchExtension):
+    game = "Paper Mario"
+
+    @staticmethod
+    def calculate_pm_crc(caller: APProcedurePatch, rom: bytes) -> bytes:
+        rom_data = bytearray(rom)
+
+        t1 = 0xA3886759  # 6103 only
+        t2 = 0xA3886759  # 6103 only
+        t3 = 0xA3886759  # 6103 only
+        t4 = 0xA3886759  # 6103 only
+        t5 = 0xA3886759  # 6103 only
+        t6 = 0xA3886759  # 6103 only
+
+        # Read contents to generate crc over
+        read_pos = 0x1000
+        for _ in range(0x100000//4):
+            d = int.from_bytes(rom_data[read_pos:read_pos + 4], "big") & 0xFFFFFFFF
+
+            if ((t6 + d) & 0xFFFFFFFF) < (t6 & 0xFFFFFFFF):
+                t4 += 1
+            t6 += d
+            t3 ^= d
+            r = (d << (d & 0x1F)) | (d >> (32 - (d & 0x1F))) & 0xFFFFFFFF
+            t5 += r
+            if (t2 & 0xFFFFFFFF) > (d & 0xFFFFFFFF):
+                t2 ^= r
+            else:
+                t2 ^= (t6 ^ d)
+            t1 += t5 ^ d
+
+            read_pos += 4
+
+        # Write new crc
+        crc1 = ((t6 ^ t4) + t3) & 0xFFFFFFFF
+        crc2 = ((t5 ^ t2) + t1) & 0xFFFFFFFF
+
+        rom_data[0x10:0x14] = crc1.to_bytes(4, byteorder="big")
+        rom_data[0x14:0x18] = crc2.to_bytes(4, byteorder="big")
+
+        return rom_data
+
 
 class PaperMarioProcedurePatch(APProcedurePatch, APTokenMixin):
     game = "Paper Mario"
@@ -41,6 +83,7 @@ class PaperMarioProcedurePatch(APProcedurePatch, APTokenMixin):
     procedure = [
         ("apply_bsdiff4", ["base_pmr_patch.bsdiff4"]),
         ("apply_tokens", [FILENAME_PMR_TOKEN_BINARY]),
+        ("calculate_pm_crc", [])
     ]
 
     @classmethod
@@ -142,7 +185,6 @@ def write_patch(
                                           + (len_battle_formations * 4))
 
     # Modify the table data in the ROM
-    changed_coin_palette = False
 
     # Set slot auth
     cur_pos: int = rom_table.info["auth_address"]
@@ -236,7 +278,6 @@ def write_patch(
 
     # Special solution for random coin palettes
     if coin_palette_data and coin_palette_targets:
-        changed_coin_palette = True
         for target_rom_location in coin_palette_targets:
             cur_pos = target_rom_location
             for palette_byte in coin_palette_data:
@@ -244,10 +285,6 @@ def write_patch(
                     cur_pos,
                     palette_byte.to_bytes(4, byteorder="big")
                 )
-
-    if changed_coin_palette:
-        #recalculate_crcs(output_path, coin_palette_crcs)
-        None # TEMP DISABLED: Cannot do this here due to procedure patching
 
     # Write output
     patch.write_file(FILENAME_PMR_TOKEN_BINARY, patch.get_token_binary())
