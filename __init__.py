@@ -34,7 +34,7 @@ from .options import (SeedGoal, PaperMarioOptions, ShuffleKootFavors, PartnerUpg
                       SpiritRequirements, ConsumableItemPool, StartingBoots)
 from .data.node import Node
 from .data.starting_maps import starting_maps
-from .Rom import generate_output, PaperMarioDeltaPatch
+from .Rom import generate_output, PaperMarioProcedurePatch
 from Fill import fill_restrictive, remaining_fill
 import pkg_resources
 from .client import PaperMarioClient  # unused but required for generic client to hook onto
@@ -46,7 +46,7 @@ class PaperMarioSettings(settings.Group):
         """File name of the Paper Mario USA ROM"""
         description = "Paper Mario ROM File"
         copy_to = "Paper Mario (USA).z64"
-        md5s = [PaperMarioDeltaPatch.hash]
+        md5s = [PaperMarioProcedurePatch.hash]
 
     class RomStart(str):
         """
@@ -777,7 +777,7 @@ class PaperMarioWorld(World):
             if loc.address is not None and not loc.show_in_spoiler:
                 loc.address = None
 
-    def generate_output(self, output_directory: str):
+    def generate_output(self, output_directory: str) -> None:
         generate_output(self, output_directory)
 
 

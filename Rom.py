@@ -27,15 +27,21 @@ from .Locations import PMLocation
 from .modules.random_shop_prices import get_shop_price
 from .modules.random_stat_distribution import generate_random_stats
 from .modules.modify_game_strings import multiworld_item_info_to_pmString
-from worlds.Files import APDeltaPatch
+from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 from settings import get_settings
 
+FILENAME_PMR_TOKEN_BINARY: str = "pmr_token_data.bin"
 
-class PaperMarioDeltaPatch(APDeltaPatch):
+class PaperMarioProcedurePatch(APProcedurePatch, APTokenMixin):
     game = "Paper Mario"
     hash = "a722f8161ff489943191330bf8416496"
     patch_file_ending = ".appm64"
     result_file_ending = ".z64"
+
+    procedure = [
+        ("apply_bsdiff4", ["base_pmr_patch.bsdiff4"]),
+        ("apply_tokens", [FILENAME_PMR_TOKEN_BINARY]),
+    ]
 
     @classmethod
     def get_source_data(cls) -> bytes:
@@ -74,9 +80,23 @@ def write_patch(
     mystery_opts: MysteryOptions,
     star_beam_area: int
 ):
-    base_rom = get_base_rom_as_bytes()
-    base_patch = pkgutil.get_data(__name__, "data/base_pmr_patch.bsdiff4")
-    patched_rom = bytearray(bsdiff4.patch(base_rom, base_patch))
+    patch: PaperMarioProcedurePatch = PaperMarioProcedurePatch(
+        player=world.player,
+        player_name=world.player_name,
+    )
+    def write_single_token(
+        cur_pos: int,
+        bytes_to_write: bytes
+    ) -> int:
+        patch.write_token(
+            APTokenTypes.WRITE,
+            cur_pos,
+            bytes_to_write
+        )
+        return cur_pos + len(bytes_to_write)
+
+    patch.write_file("base_pmr_patch.bsdiff4", pkgutil.get_data(__name__, "data/base_pmr_patch.bsdiff4"))
+
     seed_id = world.random.randint(0, 0xFFFFFFFF)
 
     # Create the ROM table
@@ -124,75 +144,116 @@ def write_patch(
     # Modify the table data in the ROM
     changed_coin_palette = False
 
-    out_file_name = world.multiworld.get_out_file_name_base(world.player)
-    output_path = os.path.join(output_directory, f"{out_file_name}.z64")
-    with open(output_path, "wb") as out_file:
-        out_file.write(patched_rom)
+    # Set slot auth
+    cur_pos: int = rom_table.info["auth_address"]
+    cur_pos = write_single_token(
+        cur_pos,
+        world.auth
+    )
 
-        # Set slot auth
-        out_file.seek(rom_table.info["auth_address"])
-        out_file.write(world.auth)
+    # Write the db header
+    cur_pos = write_single_token(
+        cur_pos,
+        rom_table.info["magic_value"].to_bytes(4, byteorder="big")
+    )
+    cur_pos = write_single_token(
+        cur_pos,
+        rom_table.info["header_size"].to_bytes(4, byteorder="big")
+    )
+    cur_pos = write_single_token(
+        cur_pos,
+        rom_table.info["db_size"].to_bytes(4, byteorder="big")
+    )
+    cur_pos = write_single_token(
+        cur_pos,
+        rom_table.info["seed"].to_bytes(4, byteorder="big")
+    )
+    cur_pos = write_single_token(
+        cur_pos,
+        rom_table.info["formations_offset"].to_bytes(4, byteorder="big")
+    )
+    _ = write_single_token(
+        cur_pos,
+        rom_table.info["itemhints_offset"].to_bytes(4, byteorder="big")
+    )
 
-        # Write the db header
-        # file.seek(rom_table.info["address"]) # we're already here, but leaving this in case we move auth elsewhere
-        out_file.write(rom_table.info["magic_value"].to_bytes(4, byteorder="big"))
-        out_file.write(rom_table.info["header_size"].to_bytes(4, byteorder="big"))
-        out_file.write(rom_table.info["db_size"].to_bytes(4, byteorder="big"))
-        out_file.write(rom_table.info["seed"].to_bytes(4, byteorder="big"))
-        out_file.write(rom_table.info["formations_offset"].to_bytes(4, byteorder="big"))
-        out_file.write(rom_table.info["itemhints_offset"].to_bytes(4, byteorder="big"))
+    # Write table data and generate log file
+    cur_pos = rom_table.info["address"] + rom_table.info["header_size"]
 
-        # Write table data and generate log file
-        out_file.seek(rom_table.info["address"] + rom_table.info["header_size"])
+    for _, pair in enumerate(table_data):
+        key_int = pair["key"].to_bytes(4, byteorder="big")
+        value_int = pair["value"].to_bytes(4, byteorder="big")
+        cur_pos = write_single_token(
+            cur_pos,
+            key_int
+        )
+        cur_pos = write_single_token(
+            cur_pos,
+            value_int
+        )
 
-        for _, pair in enumerate(table_data):
-            key_int = pair["key"].to_bytes(4, byteorder="big")
-            value_int = pair["value"].to_bytes(4, byteorder="big")
-            out_file.write(key_int)
-            out_file.write(value_int)
+    for formation in battle_formations:
+        for formation_hex_word in formation:
+            cur_pos = write_single_token(
+                cur_pos,
+                formation_hex_word.to_bytes(4, byteorder="big")
+            )
 
-        for formation in battle_formations:
-            for formation_hex_word in formation:
-                out_file.write(formation_hex_word.to_bytes(4, byteorder="big"))
+    # Write end of formations table
+    cur_pos = write_single_token(
+        cur_pos,
+        0xFFFFFFFF.to_bytes(4, byteorder="big")
+    )
 
-        # Write end of formations table
-        out_file.write(0xFFFFFFFF.to_bytes(4, byteorder="big"))
+    # Write itemhint table
+    for itemhint in itemhints:
+        for itemhint_hex in itemhint:
+            cur_pos = write_single_token(
+                cur_pos,
+                itemhint_hex.to_bytes(4, byteorder="big")
+            )
 
-        # Write itemhint table
-        for itemhint in itemhints:
-            for itemhint_hex in itemhint:
-                out_file.write(itemhint_hex.to_bytes(4, byteorder="big"))
+    # Write end of item hints table
+    cur_pos = write_single_token(
+        cur_pos,
+        0xFFFFFFFF.to_bytes(4, byteorder="big")
+    )
 
-        # Write end of item hints table
-        out_file.write(0xFFFFFFFF.to_bytes(4, byteorder="big"))
+    # Write end of db padding
+    for _ in range(1, 5):
+        cur_pos = write_single_token(
+            cur_pos,
+            0xFFFFFFFF.to_bytes(4, byteorder="big")
+        )
 
-        # Write end of db padding
-        for _ in range(1, 5):
-            out_file.write(0xFFFFFFFF.to_bytes(4, byteorder="big"))
+    # Write shop descriptions
+    for node in placed_items:
+        if node.shop_string_location != -1:
+            _ = write_single_token(
+                node.shop_string_location,
+                bytes(node.shop_string)
+            )
 
-        # Special solution for random coin palettes
-        if coin_palette_data and coin_palette_targets:
-            changed_coin_palette = True
-            for target_rom_location in coin_palette_targets:
-                out_file.seek(target_rom_location)
-                for palette_byte in coin_palette_data:
-                    out_file.write(palette_byte.to_bytes(4, byteorder="big"))
-
-        # Write shop descriptions
-        for node in placed_items:
-            if node.shop_string_location != -1:
-                out_file.seek(node.shop_string_location)
-                out_file.write(bytes(node.shop_string))
+    # Special solution for random coin palettes
+    if coin_palette_data and coin_palette_targets:
+        changed_coin_palette = True
+        for target_rom_location in coin_palette_targets:
+            cur_pos = target_rom_location
+            for palette_byte in coin_palette_data:
+                cur_pos = write_single_token(
+                    cur_pos,
+                    palette_byte.to_bytes(4, byteorder="big")
+                )
 
     if changed_coin_palette:
-        recalculate_crcs(output_path, coin_palette_crcs)
+        #recalculate_crcs(output_path, coin_palette_crcs)
+        None # TEMP DISABLED: Cannot do this here due to procedure patching
 
-    patch = PaperMarioDeltaPatch(os.path.splitext(output_path)[0] + ".appm64",
-                                 player=world.player,
-                                 player_name=world.multiworld.get_player_name(world.player),
-                                 patched_path=output_path)
-    patch.write()
-    os.unlink(output_path)
+    # Write output
+    patch.write_file(FILENAME_PMR_TOKEN_BINARY, patch.get_token_binary())
+
+    out_file_name = world.multiworld.get_out_file_name_base(world.player)
+    patch.write(os.path.join(output_directory, f"{out_file_name}{patch.patch_file_ending}"))
 
 
 def generate_output(world, output_dir: str) -> None:
