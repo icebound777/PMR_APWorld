@@ -130,11 +130,6 @@ class PaperMarioWorld(World):
 
         self.spoilerlog_puzzles = {}
 
-    @classmethod
-    def stage_assert_generate(cls, multiworld: MultiWorld) -> None:
-        if not os.path.exists(cls.settings.rom_file):
-            raise FileNotFoundError(cls.settings.rom_file)
-
     # Do some housekeeping before generating, namely fixing some options that might be incompatible with each other
     def generate_early(self) -> None:
         # load settings from pmr string before anything else, since almost all settings can be loaded this way
