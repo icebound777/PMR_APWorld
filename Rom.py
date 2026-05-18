@@ -129,14 +129,18 @@ def write_patch(
     )
     def write_single_token(
         cur_pos: int,
-        bytes_to_write: bytes
+        bytes_to_write: bytes | bytearray
     ) -> int:
+        if isinstance(bytes_to_write, bytearray):
+            immutable_bytes = bytes(bytes_to_write)
+        else:
+            immutable_bytes = bytes_to_write
         patch.write_token(
             APTokenTypes.WRITE,
             cur_pos,
-            bytes_to_write
+            immutable_bytes
         )
-        return cur_pos + len(bytes_to_write)
+        return cur_pos + len(immutable_bytes)
 
     patch.write_file("base_pmr_patch.bsdiff4", pkgutil.get_data(__name__, "data/base_pmr_patch.bsdiff4"))
 
