@@ -1,8 +1,14 @@
 # Changelog
 
+## next version
+
+### Other
+
+* Implemented Archipelago procedure patching. From now on hosts generating a multiworld seed will no longer need to provide their own Paper Mario ROM.
+
 ## 0.6.4
 
-### Bugfixes/Corrections
+### Bugfixes/Corrections (0.6.4)
 
 * Fix for Kent C Koopa logic not working correctly, which often meant the logic expected you to access the Koopa region through the sewers rather than Pleasant Path.
 
