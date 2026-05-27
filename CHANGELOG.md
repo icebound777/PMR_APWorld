@@ -9,6 +9,7 @@
 ### Other
 
 * Implemented Archipelago procedure patching. From now on hosts generating a multiworld seed will no longer need to provide their own Paper Mario ROM.
+* Added `archipelago.json` file for AP version 0.7.0 compatability.
 
 ## 0.6.4
 
