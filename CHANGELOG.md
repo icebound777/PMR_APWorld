@@ -2,6 +2,10 @@
 
 ## next version
 
+### Bugfixes/Corrections
+
+* Fix logic bug that could assume possible access to chapter 8 even though the required spirits were not obtained yet during `Required Spirits: Specific` and `Required Spirits: Specific_And_Limit_Chapter_Logic`. This could lead to impossible seeds.
+
 ### Other
 
 * Implemented Archipelago procedure patching. From now on hosts generating a multiworld seed will no longer need to provide their own Paper Mario ROM.

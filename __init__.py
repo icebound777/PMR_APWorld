@@ -219,9 +219,12 @@ class PaperMarioWorld(World):
 
         # limit chapter logic only applies when using the specific star spirits setting
         if self.options.spirit_requirements.value == SpiritRequirements.option_Any:
+            self.require_specific_spirits = False
             self.required_spirits = []
             self.excluded_spirits = []
         else:
+            self.require_specific_spirits = True
+
             # determine which star spirits are needed
             remaining_spirits = [i for i in range(1, 8)]
             chosen_spirits = []
