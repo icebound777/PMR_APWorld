@@ -2,24 +2,25 @@
 
 ## AP World
 
-- [AP PMR Release Page](https://github.com/JKBSunshine/PMR_APWorld/releases)
-- [Sample YAML,](https://github.com/JKBSunshine/PMR_APWorld/blob/main/docs/PM%20Sample.yaml) which has notes for what settings are and aren't implemented
-- [Options Syntax and Explanations](https://github.com/JKBSunshine/PMR_APWorld/blob/main/options.py)
+- [AP PMR Release Page](https://github.com/icebound777/PMR_APWorld/releases)
+- [Sample YAML,](https://github.com/icebound777/PMR_APWorld/blob/main/docs/PM%20Sample.yaml) which has notes for what settings are and aren't implemented
+- [Options Syntax and Explanations](https://github.com/icebound777/PMR_APWorld/blob/main/options.py)
 
 ## Paper Mario Randomizer
 
 - [PMR Site](https://pm64randomizer.com/)
-- [PMR Wiki,](https://github.com/icebound777/PMR-SeedGenerator/wiki) with easily missable locations, tips, and a logic guide
+- [PMR Wiki](https://github.com/icebound777/PMR-SeedGenerator/wiki), with easily missable locations, tips, and a logic guide
 - [Nintendo Power Official Strategy Guide](https://ia801606.us.archive.org/6/items/PaperMarioNintendoPowerOfficialStrategyGuide_20170328/PaperMarioNintendoPowerOfficialStrategyGuide.pdf)
  complete with maps, item locations, recipes, and more.
 
 ## Trackers
 
-- [Emo/Pop Tracker Pack by Phantom](https://github.com/Phantom5800/pmr-emotracker/releases).
-Emo Tracker packs can be opened and used in Pop Tracker.
-- [Web Tracker by Scatter](https://pmr-tracker.christianlegge.dev/)
-- [Web Tracker by Yami,](https://pm64r-tracker.mryami.com/) with AP integration! Use the Archipelago button in the top left
-- You can view the key item tracker in your in-game inventory and view the map for checks remaining in an area
+- [Pop Tracker Pack by ObsidianMaker, based on Phantom's](https://github.com/boiscljo/pmr-tracker/releases) Currently the most up to date tracker. Can autotrack via AP integration
+- [Web Tracker by Yami](https://pm64r-tracker.mryami.xyz/), has AP integration: Use the :apcolor: button in the top left.
+- [Web Tracker by Scatter](https://pmr-tracker.christianlegge.dev/) (no autotracking)
+- [Emo/Pop Tracker Pack by Phantom](https://github.com/Phantom5800/pmr-emotracker/releases) **OUTDATED, CANNOT AUTOTRACK**. Emo Tracker packs can be opened and used in Pop Tracker.
+
+You can view the key item tracker in your in-game inventory and view the map for checks remaining in an area
 
 ## First Time Players
 
