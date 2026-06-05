@@ -1,12 +1,27 @@
 # Changelog
 
-## 0.6.5
+## 0.6.6
 
 ### Bugfixes/Corrections
 
-* Fix logic bug that could assume possible access to chapter 8 even though the required spirits were not obtained yet during `Required Spirits: Specific` and `Required Spirits: Specific_And_Limit_Chapter_Logic`. This could lead to impossible seeds.
+* Fixed packaging mistake of the apworld file, leading to errors during seed generation.
 
 ### Other
+
+* Updated the `Ressources and FAQ` docs
+  * Swap links to point to the new Github repository
+  * Update the tracker list
+* Updated the setup docs
+  * Mention bizhawk 2.11 or newer as possible emulator version
+  * Add setup guide for Luna's Project64
+
+## 0.6.5
+
+### Bugfixes/Corrections (0.6.5)
+
+* Fix logic bug that could assume possible access to chapter 8 even though the required spirits were not obtained yet during `Required Spirits: Specific` and `Required Spirits: Specific_And_Limit_Chapter_Logic`. This could lead to impossible seeds.
+
+### Other (0.6.5)
 
 * Implemented Archipelago procedure patching. From now on hosts generating a multiworld seed will no longer need to provide their own Paper Mario ROM.
 * Added `archipelago.json` file for AP version 0.7.0 compatability.
