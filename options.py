@@ -2,7 +2,15 @@
 Option definitions for Paper Mario 64
 """
 
-from Options import Choice, Range, DeathLink, Toggle, DefaultOnToggle, FreeText, PerGameCommonOptions
+from Options import (
+    Choice,
+    Range,
+    DeathLink,
+    Toggle,
+    DefaultOnToggle,
+    FreeText,
+    PerGameCommonOptions,
+)
 from dataclasses import dataclass
 
 
