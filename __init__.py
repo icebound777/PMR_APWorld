@@ -1,8 +1,7 @@
 import settings
-import typing
 import os
 import logging
-from typing import Dict, Any, TextIO
+from typing import Dict, Any, TextIO, Union, ClassVar
 from BaseClasses import (
     Tutorial,
     CollectionState,
@@ -90,7 +89,7 @@ class PaperMarioSettings(settings.Group):
         """
 
     rom_file: RomFile = RomFile(RomFile.copy_to)
-    rom_start: typing.Union[RomStart, bool] = True
+    rom_start: Union[RomStart, bool] = True
 
 
 # information for the supported games setup guide; set up to make it easier to
@@ -126,7 +125,7 @@ class PaperMarioWorld(World):
     options: PaperMarioOptions
 
     settings_key = "paper_mario_settings"
-    settings: typing.ClassVar[PaperMarioSettings]
+    settings: ClassVar[PaperMarioSettings]
 
     item_name_to_id = {
         item_name: pm_data_to_ap_id(data, False)
