@@ -5,7 +5,9 @@ from BaseClasses import Region, MultiWorld
 
 from .Entrance import PMEntrance
 from .Locations import PMLocation, location_factory
+
 from .data.regions.boos_mansion import boos_mansion_regions
+from .data.regions.crystal_palace import crystal_palace_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -23,7 +25,10 @@ def get_regions(
     excluded_areas: List[str],
     ch_excluded_location_names: List[str]
 ) -> Generator[PMRegion, None, None]:
-    for region_entry in boos_mansion_regions:
+    for region_entry in (
+        boos_mansion_regions
+        + crystal_palace_regions
+    ):
         new_region = PMRegion(
             region_entry["region_name"],
             world_player,

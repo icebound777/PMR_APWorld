@@ -4,9 +4,29 @@ import dataclasses
 from typing_extensions import override
 
 #from BaseClasses import CollectionState
-from rule_builder.rules import Rule, Has, HasAny, HasAllCounts, True_
+from rule_builder.rules import (
+    #And,
+    #Or,
+    #AtLeast,
+    True_,
+    #False_,
+    Has,
+    #HasAll,
+    #HasAny,
+    HasAllCounts,
+    #HasAnyCount,
+    #HasFromList,
+    #HasFromListUnique,
+    #HasGroup,
+    #HasGroupUnique,
+    #CanReachLocation,
+    #CanReachRegion,
+    #CanReachEntrance,
+    Rule,
+    OptionFilter,
+)
 
-#import ...__init__
+from ...options import HiddenBlockMode
 
 # Gear Helper Rules
 
@@ -59,6 +79,19 @@ class CanShakeTrees(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
         return (Has("Bombette") | HasHammer()).resolve(world)
+
+@dataclasses.dataclass()
+class CanSeeHiddenBlocks(Rule["PaperMarioWorld"], game="Paper Mario"):
+    @override
+    def _instantiate(self, world) -> Rule.Resolved:
+        return CanUseAbilityWatt(
+            options=[OptionFilter(
+                HiddenBlockMode,
+                HiddenBlockMode.option_Always_Visible,
+                operator="lt",
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 ### Partner Abilities
 
