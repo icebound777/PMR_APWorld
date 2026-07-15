@@ -20,7 +20,7 @@ from .modules.random_audio import get_randomized_audio
 from .modules.random_map_mirroring import get_mirrored_map_list
 from .modules.random_movecosts import get_randomized_moves
 from .modules.random_palettes import get_randomized_palettes
-from .Regions import PMRegion
+from .Regions import PMRegion, get_regions
 from .RuleParser import Rule_AST_Transformer
 from .Entrance import PMEntrance
 from .Utils import load_json_data
@@ -351,10 +351,16 @@ class PaperMarioWorld(World):
         menu.exits.append(start)
         self.multiworld.regions.append(menu)
 
+        # Load regions
+        self.load_regions()
+
         # Load region json files
         file_list: list = []
         for file in pkg_resources.resource_listdir(__name__, "data/regions"):
             if not pkg_resources.resource_isdir(__name__, "data/regions/" + file):
+                if file.endswith(".py"):
+                    print(f"Skipping {file}")
+                    continue
                 file_list.append(file)
         file_list.sort()
         for file in file_list:
@@ -543,6 +549,25 @@ class PaperMarioWorld(World):
                 self.player
             )
             loc.parent_region.locations.remove(loc)
+
+    def load_regions(self):
+        # Call get_regions generator function to get all regions that are
+        # defined as python files
+        for region in get_regions(
+            self.player,
+            self.multiworld,
+            self.excluded_areas,
+            self.ch_excluded_location_names,
+        ):
+            self.multiworld.regions.append(region)
+            self.regions.append(region)
+            self._regions_cache[region.name] = region
+            for location in region.locations:
+                if location.access_rule is not None:
+                    self.set_rule(location, location.access_rule)
+            for exit in region.exits:
+                if exit.access_rule is not None:
+                    self.set_rule(exit, exit.access_rule)
 
     def load_regions_from_json(self, file_path):
         region_json = load_json_data(file_path)

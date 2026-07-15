@@ -1,5 +1,11 @@
+from collections.abc import Generator
+from typing import Any, List
+
 from BaseClasses import Region, MultiWorld
 
+from .Entrance import PMEntrance
+from .Locations import PMLocation, location_factory
+from .data.regions.boos_mansion import boos_mansion_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -9,3 +15,83 @@ class PMRegion(Region):
         self.map_name = None
         self.map_id = None
         self.area_id = None
+
+
+def get_regions(
+    world_player: Any,
+    multiworld: Any,
+    excluded_areas: List[str],
+    ch_excluded_location_names: List[str]
+) -> Generator[PMRegion, None, None]:
+    for region_entry in boos_mansion_regions:
+        new_region = PMRegion(
+            region_entry["region_name"],
+            world_player,
+            multiworld,
+        )
+
+        region_prefix: str = region_entry["region_name"][:3]
+
+        for entry_key in region_entry.keys():
+            if "area_id" == entry_key:
+                new_region.font_color = region_entry["area_id"]
+            elif "map_id" == entry_key:
+                new_region.map_id = region_entry["map_id"]
+            elif "map_name" == entry_key:
+                new_region.scene = region_entry["map_name"]
+
+            elif "locations" == entry_key and region_prefix not in excluded_areas:
+                for (location_name, rule) in [
+                    (x, y)
+                    for (x, y) in region_entry["locations"].items()
+                    if x not in ch_excluded_location_names
+                ]:
+                    new_location = location_factory(location_name, world_player)
+                    new_location.parent_region = new_region
+                    new_location.access_rule = rule
+                    #set_rule
+                    #if new_location.never:
+                    #    # We still need to fill the location even if ALR is off.
+                    #    logger.debug('Unreachable location: %s', new_location.name)
+                    new_location.player = world_player
+                    new_region.locations.append(new_location)
+
+            elif "events" == entry_key and region_prefix not in excluded_areas:
+                for (event_name, rule) in region_entry["events"].items():
+                    # Allow duplicate placement of events
+                    lname = '%s from %s' % (event_name, new_region.name)
+                    new_location = PMLocation(
+                        world_player,
+                        lname,
+                        event = True,
+                        parent = new_region,
+                    )
+                    new_location.access_rule = rule
+                    #if new_location.never:
+                    #    logger.debug('Dropping unreachable event: %s', new_location.name)
+                    #else:
+                    #    new_location.player = self.player
+                    #    new_region.locations.append(new_location)
+                    #    self.make_event_item(event, new_location)
+                    #    new_location.show_in_spoiler = False
+                    new_location.player = world_player
+                    new_location.show_in_spoiler = False
+                    new_region.locations.append(new_location)
+            elif "exits" == entry_key:
+                for exit_name, rule in region_entry["exits"].items():
+                    new_exit = PMEntrance(
+                        world_player,
+                        multiworld,
+                        f"{new_region.name} -> {exit_name}",
+                        new_region,
+                    )
+                    new_exit.vanilla_connected_region = exit_name
+                    new_exit.access_rule = rule
+                    #self.parser.parse_spot_rule(new_exit)
+                    #if new_exit.never:
+                    #    logger.debug('Dropping unreachable exit: %s', new_exit.name)
+                    #else:
+                    #    new_region.exits.append(new_exit)
+                    new_region.exits.append(new_exit)
+
+        yield new_region
