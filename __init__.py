@@ -352,34 +352,38 @@ class PaperMarioWorld(World):
         self.multiworld.regions.append(menu)
 
         # Load region json files
+        file_list: list = []
         for file in pkg_resources.resource_listdir(__name__, "data/regions"):
             if not pkg_resources.resource_isdir(__name__, "data/regions/" + file):
-                readfile = True
-                match file:
-                    case "bowser's_castle.json":
-                        readfile = (
-                                self.options.bowser_castle_mode.value == BowserCastleMode.option_Vanilla
-                            and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                        )
-                    case "bowser's_castle_shortened.json":
-                        readfile = (
-                                self.options.bowser_castle_mode.value == BowserCastleMode.option_Shortened
-                            and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                        )
-                    case "bowser's_castle_boss_rush.json":
-                        readfile = (
-                                self.options.bowser_castle_mode.value == BowserCastleMode.option_Boss_Rush
-                            and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                        )
-                    case "shooting_star_summit_no_star_way.json":
-                        readfile = self.options.seed_goal.value == SeedGoal.option_Open_Star_Way
-                    case "shooting_star_summit.json":
-                        readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                    case "peachs_castle.json":
-                        readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
+                file_list.append(file)
+        file_list.sort()
+        for file in file_list:
+            readfile = True
+            match file:
+                case "bowser's_castle.json":
+                    readfile = (
+                            self.options.bowser_castle_mode.value == BowserCastleMode.option_Vanilla
+                        and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
+                    )
+                case "bowser's_castle_shortened.json":
+                    readfile = (
+                            self.options.bowser_castle_mode.value == BowserCastleMode.option_Shortened
+                        and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
+                    )
+                case "bowser's_castle_boss_rush.json":
+                    readfile = (
+                            self.options.bowser_castle_mode.value == BowserCastleMode.option_Boss_Rush
+                        and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
+                    )
+                case "shooting_star_summit_no_star_way.json":
+                    readfile = self.options.seed_goal.value == SeedGoal.option_Open_Star_Way
+                case "shooting_star_summit.json":
+                    readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
+                case "peachs_castle.json":
+                    readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
 
-                if readfile:
-                    self.load_regions_from_json("regions/" + file)
+            if readfile:
+                self.load_regions_from_json("regions/" + file)
 
         # Connect start to chosen starting map
         start.connect(self.get_region(starting_maps[self.options.starting_map.value][1]))
