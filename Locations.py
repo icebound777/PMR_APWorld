@@ -1,3 +1,5 @@
+from typing import List
+
 from BaseClasses import Location
 from .data.LocationsList import location_table
 
@@ -51,7 +53,7 @@ class PMLocation(Location):
 
 
 # used when loading regions from json to create location objects
-def location_factory(locations, player: int):
+def location_factory(locations, player: int) -> PMLocation | List[PMLocation]:
     ret = []
     singleton = False
 
