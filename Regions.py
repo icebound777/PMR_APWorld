@@ -11,6 +11,7 @@ from .data.regions.crystal_palace import crystal_palace_regions
 from .data.regions.dry_dry_desert import dry_dry_desert_regions
 from .data.regions.dry_dry_outpost import dry_dry_outpost_regions
 from .data.regions.dry_dry_ruins import dry_dry_ruins_regions
+from .data.regions.flower_fields import flower_fields_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -34,6 +35,7 @@ def get_regions(
         + dry_dry_desert_regions
         + dry_dry_outpost_regions
         + dry_dry_ruins_regions
+        + flower_fields_regions
     ):
         new_region = PMRegion(
             region_entry["region_name"],
