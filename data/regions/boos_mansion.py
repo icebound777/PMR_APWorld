@@ -44,7 +44,7 @@ boos_mansion_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
             ),
             "BM Foyer Franky Letter Reward": HasAll(
                 "RF_OpenedGustyGulch",
-                "Letter_to_Franky",
+                "Letter to Franky",
             ) & CanUseAbilityParakarry(),
             "BM Foyer Hidden Panel": True_() & CanFlipPanels()
         },
@@ -121,10 +121,10 @@ boos_mansion_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
       "map_id": "2",
       "map_name": "Basement",
       "events": {
-        "RF_OBK03_BuiltStairs": Has("Boots")
+        "RF_OBK03_BuiltStairs": HasBoots(),
       },
       "locations": {
-        "BM Basement Igor Letter Reward": CanUseAbilityParakarry() & Has("Letter_to_Igor"),
+        "BM Basement Igor Letter Reward": CanUseAbilityParakarry() & Has("Letter to Igor"),
         "BM Basement Shop Item 1": Has("RF_OpenedGustyGulch"),
         "BM Basement Shop Item 2": Has("RF_OpenedGustyGulch"),
         "BM Basement Shop Item 3": Has("RF_OpenedGustyGulch"),
@@ -195,7 +195,7 @@ boos_mansion_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
       "map_id": "6",
       "map_name": "Record Player Room",
       "locations": {
-        "BM Record Player Room In Chest": Has("Boo_Record")
+        "BM Record Player Room In Chest": Has("Boo Record")
       },
       "exits": {
         "BM Foyer 2F": None
