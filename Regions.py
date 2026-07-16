@@ -18,6 +18,7 @@ from .data.regions.gusty_gulch import gusty_gulch_regions
 from .data.regions.inside_the_whale import inside_the_whale_regions
 from .data.regions.jade_jungle import jade_jungle_regions
 from .data.regions.koopa_bros_fortress import koopa_bros_fortress_regions
+from .data.regions.koopa_region import koopa_region_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -48,6 +49,7 @@ def get_regions(
         + inside_the_whale_regions
         + jade_jungle_regions
         + koopa_bros_fortress_regions
+        + koopa_region_regions
     ):
         new_region = PMRegion(
             region_entry["region_name"],
