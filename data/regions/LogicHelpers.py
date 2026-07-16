@@ -26,7 +26,7 @@ from rule_builder.rules import (
     OptionFilter,
 )
 
-from ...options import HiddenBlockMode
+from ...options import HiddenBlockMode, PartnersAlwaysUsable
 
 # Gear Helper Rules
 
@@ -34,37 +34,37 @@ from ...options import HiddenBlockMode
 class HasHammer(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        return HasAllCounts({"Progressive Hammer": 1}).resolve(world)
+        return Has("Progressive Hammer", count=1).resolve(world)
 
 @dataclasses.dataclass()
 class HasSuperHammer(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        return HasAllCounts({"Progressive Hammer": 2}).resolve(world)
+        return Has("Progressive Hammer", count=2).resolve(world)
 
 @dataclasses.dataclass()
 class HasUltraHammer(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        return HasAllCounts({"Progressive Hammer": 3}).resolve(world)
+        return Has("Progressive Hammer", count=3).resolve(world)
 
 @dataclasses.dataclass()
 class HasBoots(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        return HasAllCounts({"Progressive Boots": 1}).resolve(world)
+        return Has("Progressive Boots", count=1).resolve(world)
 
 @dataclasses.dataclass()
 class HasSuperBoots(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        return HasAllCounts({"Progressive Boots": 2}).resolve(world)
+        return Has("Progressive Boots", count=2).resolve(world)
 
 @dataclasses.dataclass()
 class HasUltraBoots(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        return HasAllCounts({"Progressive Boots": 3}).resolve(world)
+        return Has("Progressive Boots", count=3).resolve(world)
 
 # General World Interaction
 
@@ -99,64 +99,92 @@ class CanSeeHiddenBlocks(Rule["PaperMarioWorld"], game="Paper Mario"):
 class CanUseAbilityKooper(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        if world.options.partners_always_usable.value:
-            return True_().resolve(world)
-        else:
-            return Has("Kooper").resolve(world)
+        return Has(
+            "Kooper",
+            options=[OptionFilter(
+                PartnersAlwaysUsable,
+                False,
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 @dataclasses.dataclass()
 class CanUseAbilityBombette(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        if world.options.partners_always_usable.value:
-            return True_().resolve(world)
-        else:
-            return Has("Bombette").resolve(world)
+        return Has(
+            "Bombette",
+            options=[OptionFilter(
+                PartnersAlwaysUsable,
+                False,
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 @dataclasses.dataclass()
 class CanUseAbilityParakarry(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        if world.options.partners_always_usable.value:
-            return True_().resolve(world)
-        else:
-            return Has("Parakarry").resolve(world)
+        return Has(
+            "Parakarry",
+            options=[OptionFilter(
+                PartnersAlwaysUsable,
+                False,
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 @dataclasses.dataclass()
 class CanUseAbilityBow(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        if world.options.partners_always_usable.value:
-            return True_().resolve(world)
-        else:
-            return Has("Bow").resolve(world)
+        return Has(
+            "Bow",
+            options=[OptionFilter(
+                PartnersAlwaysUsable,
+                False,
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 @dataclasses.dataclass()
 class CanUseAbilityWatt(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        if world.options.partners_always_usable.value:
-            return True_().resolve(world)
-        else:
-            return Has("Watt").resolve(world)
+        return Has(
+            "Watt",
+            options=[OptionFilter(
+                PartnersAlwaysUsable,
+                False,
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 @dataclasses.dataclass()
 class CanUseAbilitySushie(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        if world.options.partners_always_usable.value:
-            return True_().resolve(world)
-        else:
-            return Has("Sushie").resolve(world)
+        return Has(
+            "Sushie",
+            options=[OptionFilter(
+                PartnersAlwaysUsable,
+                False,
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 @dataclasses.dataclass()
 class CanUseAbilityLakilester(Rule["PaperMarioWorld"], game="Paper Mario"):
     @override
     def _instantiate(self, world) -> Rule.Resolved:
-        if world.options.partners_always_usable.value:
-            return True_().resolve(world)
-        else:
-            return Has("Lakilester").resolve(world)
+        return Has(
+            "Lakilester",
+            options=[OptionFilter(
+                PartnersAlwaysUsable,
+                False,
+            )],
+            filtered_resolution=True,
+        ).resolve(world)
 
 ### Multiple Solutions to the task
 
