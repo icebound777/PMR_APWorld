@@ -55,7 +55,8 @@ def get_regions(
                 ]:
                     new_location = location_factory(location_name, world_player)
                     new_location.parent_region = new_region
-                    new_location.access_rule = rule
+                    if rule is not None:
+                        new_location.access_rule = rule
                     #set_rule
                     #if new_location.never:
                     #    # We still need to fill the location even if ALR is off.
@@ -73,7 +74,8 @@ def get_regions(
                         event = True,
                         parent = new_region,
                     )
-                    new_location.access_rule = rule
+                    if rule is not None:
+                        new_location.access_rule = rule
                     #if new_location.never:
                     #    logger.debug('Dropping unreachable event: %s', new_location.name)
                     #else:
@@ -93,7 +95,8 @@ def get_regions(
                         new_region,
                     )
                     new_exit.vanilla_connected_region = exit_name
-                    new_exit.access_rule = rule
+                    if rule is not None:
+                        new_exit.access_rule = rule
                     #self.parser.parse_spot_rule(new_exit)
                     #if new_exit.never:
                     #    logger.debug('Dropping unreachable exit: %s', new_exit.name)

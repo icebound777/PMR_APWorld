@@ -562,11 +562,9 @@ class PaperMarioWorld(World):
             self.regions.append(region)
             self._regions_cache[region.name] = region
             for location in region.locations:
-                if location.access_rule is not None:
-                    self.set_rule(location, location.access_rule)
+                self.set_rule(location, location.access_rule)
             for exit in region.exits:
-                if exit.access_rule is not None:
-                    self.set_rule(exit, exit.access_rule)
+                self.set_rule(exit, exit.access_rule)
 
     def load_regions_from_json(self, file_path):
         region_json = load_json_data(file_path)
