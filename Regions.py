@@ -8,6 +8,7 @@ from .Locations import PMLocation, location_factory
 
 from .data.regions.boos_mansion import boos_mansion_regions
 from .data.regions.crystal_palace import crystal_palace_regions
+from .data.regions.dry_dry_desert import dry_dry_desert_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -28,6 +29,7 @@ def get_regions(
     for region_entry in (
         boos_mansion_regions
         + crystal_palace_regions
+        + dry_dry_desert_regions
     ):
         new_region = PMRegion(
             region_entry["region_name"],
