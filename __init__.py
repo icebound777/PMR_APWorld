@@ -562,6 +562,8 @@ class PaperMarioWorld(World):
             self.regions.append(region)
             self._regions_cache[region.name] = region
             for location in region.locations:
+                if location.event is not None and location.event:
+                    self.make_event_item(location.name, location)
                 self.set_rule(location, location.access_rule)
             for exit in region.exits:
                 self.set_rule(exit, exit.access_rule)
