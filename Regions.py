@@ -15,6 +15,7 @@ from .data.regions.flower_fields import flower_fields_regions
 from .data.regions.forever_forest import forever_forest_regions
 from .data.regions.goomba_village import goomba_village_regions
 from .data.regions.gusty_gulch import gusty_gulch_regions
+from .data.regions.inside_the_whale import inside_the_whale_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -42,6 +43,7 @@ def get_regions(
         + forever_forest_regions
         + goomba_village_regions
         + gusty_gulch_regions
+        + inside_the_whale_regions
     ):
         new_region = PMRegion(
             region_entry["region_name"],
