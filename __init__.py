@@ -557,6 +557,7 @@ class PaperMarioWorld(World):
             self.multiworld,
             self.excluded_areas,
             self.ch_excluded_location_names,
+            self.options.seed_goal,
         ):
             self.multiworld.regions.append(region)
             self.regions.append(region)

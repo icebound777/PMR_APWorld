@@ -1,10 +1,12 @@
 from collections.abc import Generator
-from typing import Any, List
+from typing import Any, List, Dict
 
 from BaseClasses import Region, MultiWorld
+from rule_builder.rules import Rule
 
 from .Entrance import PMEntrance
 from .Locations import PMLocation, location_factory
+from .options import SeedGoal
 
 from .data.regions.boos_mansion import boos_mansion_regions
 from .data.regions.crystal_palace import crystal_palace_regions
@@ -43,32 +45,40 @@ def get_regions(
     world_player: Any,
     multiworld: Any,
     excluded_areas: List[str],
-    ch_excluded_location_names: List[str]
+    ch_excluded_location_names: List[str],
+    seed_goal: SeedGoal
 ) -> Generator[PMRegion, None, None]:
-    for region_entry in (
-        boos_mansion_regions
-        + crystal_palace_regions
-        + dry_dry_desert_regions
-        + dry_dry_outpost_regions
-        + dry_dry_ruins_regions
-        + flower_fields_regions
-        + forever_forest_regions
-        + goomba_village_regions
-        + gusty_gulch_regions
-        + inside_the_whale_regions
-        + jade_jungle_regions
-        + koopa_bros_fortress_regions
-        + koopa_region_regions
-        + minigames_regions
-        + mt_lavalava_regions
-        + mt_rugged_regions
-        + peachs_castle_regions
-        + shiver_region_regions
-        + shy_guys_toybox_regions
-        + toad_town_tunnels_regions
-        + toad_town_regions
-        + tubbas_castle_regions
-    ):
+    optionfiltered_regions: list[Dict[str, str | Dict[str, Rule | None]]] = []
+    for region_data in [
+        boos_mansion_regions,
+        crystal_palace_regions,
+        dry_dry_desert_regions,
+        dry_dry_outpost_regions,
+        dry_dry_ruins_regions,
+        flower_fields_regions,
+        forever_forest_regions,
+        goomba_village_regions,
+        gusty_gulch_regions,
+        inside_the_whale_regions,
+        jade_jungle_regions,
+        koopa_bros_fortress_regions,
+        koopa_region_regions,
+        minigames_regions,
+        mt_lavalava_regions,
+        mt_rugged_regions,
+        shiver_region_regions,
+        shy_guys_toybox_regions,
+        toad_town_tunnels_regions,
+        toad_town_regions,
+        tubbas_castle_regions,
+    ]:
+        optionfiltered_regions.extend(region_data)
+
+    if seed_goal != SeedGoal.option_Open_Star_Way:
+        # Open Star Way makes Peach's Castle unreachable
+        optionfiltered_regions.extend(peachs_castle_regions)
+
+    for region_entry in optionfiltered_regions:
         new_region = PMRegion(
             region_entry["region_name"],
             world_player,
