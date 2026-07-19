@@ -25,6 +25,7 @@ from .data.regions.mt_rugged import mt_rugged_regions
 from .data.regions.peachs_castle import peachs_castle_regions
 from .data.regions.shiver_region import shiver_region_regions
 from .data.regions.shy_guys_toybox import shy_guys_toybox_regions
+from .data.regions.toad_town_tunnels import toad_town_tunnels_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -62,6 +63,7 @@ def get_regions(
         + peachs_castle_regions
         + shiver_region_regions
         + shy_guys_toybox_regions
+        + toad_town_tunnels_regions
     ):
         new_region = PMRegion(
             region_entry["region_name"],
