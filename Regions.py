@@ -20,6 +20,7 @@ from .data.regions.jade_jungle import jade_jungle_regions
 from .data.regions.koopa_bros_fortress import koopa_bros_fortress_regions
 from .data.regions.koopa_region import koopa_region_regions
 from .data.regions.minigames import minigames_regions
+from .data.regions.mt_lavalava import mt_lavalava_regions
 
 class PMRegion(Region):
     game: str = "Paper Mario"
@@ -52,6 +53,7 @@ def get_regions(
         + koopa_bros_fortress_regions
         + koopa_region_regions
         + minigames_regions
+        + mt_lavalava_regions
     ):
         new_region = PMRegion(
             region_entry["region_name"],
