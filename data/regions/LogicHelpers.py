@@ -3,19 +3,19 @@ import dataclasses
 
 from typing_extensions import override
 
-#from BaseClasses import CollectionState
+from rule_builder.field_resolvers import FromOption, FromWorldAttr
 from rule_builder.rules import (
     #And,
     #Or,
     #AtLeast,
     True_,
-    #False_,
+    False_,
     Has,
     #HasAll,
     #HasAny,
     HasAllCounts,
     #HasAnyCount,
-    #HasFromList,
+    HasFromList,
     #HasFromListUnique,
     #HasGroup,
     #HasGroupUnique,
@@ -26,7 +26,16 @@ from rule_builder.rules import (
     OptionFilter,
 )
 
-from ...options import HiddenBlockMode, PartnersAlwaysUsable
+from ...options import (
+    HiddenBlockMode,
+    PartnersAlwaysUsable,
+    PowerStarHunt,
+    SpiritRequirements,
+    StarWayPowerStarsRequired,
+    StarWaySpiritsRequired,
+    StarBeamPowerStarsRequired,
+    StarBeamSpiritsRequired,
+)
 
 # Gear Helper Rules
 
@@ -233,7 +242,90 @@ class CanReenterVerticalPipes(Rule["PaperMarioWorld"], game="Paper Mario"):
             | HasBoots()
         ).resolve(world)
 
+# Endgame requirements
 
+@dataclasses.dataclass()
+class CanOpenStarWay(Rule["PaperMarioWorld"], game="Paper Mario"):
+    @override
+    def _instantiate(self, world) -> Rule.Resolved:
+        rule_starway_spirits: Rule = HasFromList(
+            "STARSPIRIT",
+            count=FromOption(StarWaySpiritsRequired)
+        )
+        has_required_spirits: Rule = (
+            Has(
+                "STARSPIRIT_1",
+                count=1 if FromWorldAttr("require_eldstar") else 0
+            )
+            & Has(
+                "STARSPIRIT_2",
+                count=1 if FromWorldAttr("require_mamar") else 0
+            )
+            & Has(
+                "STARSPIRIT_3",
+                count=1 if FromWorldAttr("require_skolar") else 0
+            )
+            & Has(
+                "STARSPIRIT_4",
+                count=1 if FromWorldAttr("require_muskular") else 0
+            )
+            & Has(
+                "STARSPIRIT_5",
+                count=1 if FromWorldAttr("require_misstar") else 0
+            )
+            & Has(
+                "STARSPIRIT_6",
+                count=1 if FromWorldAttr("require_klevar") else 0
+            )
+            & Has(
+                "STARSPIRIT_7",
+                count=1 if FromWorldAttr("require_kalmar") else 0
+            )
+        )
+
+        rule_starway_spirits_specific: Rule = (
+            has_required_spirits
+            | False_(
+                options=[OptionFilter(
+                    SpiritRequirements,
+                    SpiritRequirements.option_Any,
+                    operator="ne",
+                )],
+                filtered_resolution=True,
+            )
+        )
+
+        rule_starway_powerstars: Rule = Has(
+            "Power Star",
+            count=FromOption(StarWayPowerStarsRequired),
+            options=[OptionFilter(PowerStarHunt, True)],
+            filtered_resolution=True,
+        )
+        return (
+            rule_starway_spirits
+            & rule_starway_spirits_specific
+            & rule_starway_powerstars
+        ).resolve(world)
+
+@dataclasses.dataclass()
+class HasStarBeamRequirements(Rule["PaperMarioWorld"], game="Paper Mario"):
+    @override
+    def _instantiate(self, world) -> Rule.Resolved:
+        star_beam_star_spirits: Rule = HasFromList(
+            "STARSPIRIT",
+            count=FromOption(StarBeamSpiritsRequired)
+        )
+        star_beam_power_stars: Rule = Has(
+            "Power Star",
+            count=FromOption(StarBeamPowerStarsRequired),
+            options=[OptionFilter(PowerStarHunt, True)],
+            filtered_resolution=True,
+        )
+
+        return (
+            star_beam_star_spirits
+            & star_beam_power_stars
+        ).resolve(world)
 
 logichelpers: Dict[str, Rule] = {
     "Boots": "(Progressive_Boots, 1)",
@@ -262,17 +354,6 @@ logichelpers: Dict[str, Rule] = {
 
     "can_see_hidden_blocks": "can_use_ability_watt or hidden_block_mode == 3",
 
-    "has_required_spirits": "('STARSPIRIT_1' or 1 not in required_spirits) and ('STARSPIRIT_2' or 2 not in required_spirits) and ('STARSPIRIT_3' or 3 not in required_spirits) and ('STARSPIRIT_4' or 4 not in required_spirits) and ('STARSPIRIT_5' or 5 not in required_spirits) and ('STARSPIRIT_6' or 6 not in required_spirits) and ('STARSPIRIT_7' or 7 not in required_spirits)",
-
-    "star_way_star_spirits": "('STARSPIRIT', star_way_spirits)",
-    "star_way_power_stars": "(Power_Star, star_way_power_stars) or not power_star_hunt",
-    "star_way_specific_spirits": "has_required_spirits or not require_specific_spirits",
-    "can_reach_star_way": "star_way_star_spirits and star_way_power_stars and star_way_specific_spirits",
-    "star_way_goal": "seed_goal == 1",
-
-    "star_beam_power_stars": "(Power_Star, star_beam_power_stars) or not power_star_hunt",
-    "star_beam_star_spirits": "('STARSPIRIT', star_beam_spirits)",
-    "has_star_beam_requirements": "star_beam_star_spirits and star_beam_power_stars",
 
     "can_use_ability_kooper": "Kooper or partners_always_usable",
     "can_use_ability_bombette": "Bombette or partners_always_usable",
