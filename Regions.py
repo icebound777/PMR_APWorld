@@ -9,6 +9,7 @@ from .Locations import PMLocation, location_factory
 from .options import SeedGoal
 
 from .data.regions.boos_mansion import boos_mansion_regions
+from .data.regions.bowsers_castle import bowsers_castle_regions
 from .data.regions.crystal_palace import crystal_palace_regions
 from .data.regions.dry_dry_desert import dry_dry_desert_regions
 from .data.regions.dry_dry_outpost import dry_dry_outpost_regions
@@ -52,6 +53,7 @@ def get_regions(
     optionfiltered_regions: list[Dict[str, str | Dict[str, Rule | None]]] = []
     for region_data in [
         boos_mansion_regions,
+        bowsers_castle_regions,
         crystal_palace_regions,
         dry_dry_desert_regions,
         dry_dry_outpost_regions,
