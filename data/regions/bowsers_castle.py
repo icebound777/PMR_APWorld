@@ -229,7 +229,7 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
             "BC Lava Channel 2 East": (
                 CanClimbSteps()
                 & (CanUseAbilityParakarry() | Has("GF_KPA16_ShutOffLava"))
-                & (CanUseAbilityLakilester() | HasBoots | Has("GF_KPA16_ShutOffLava"))
+                & (CanUseAbilityLakilester() | HasBoots() | Has("GF_KPA16_ShutOffLava"))
             ),
             "BC Lava Channel 2 Central Exit": (
                 CanClimbSteps()
@@ -269,7 +269,7 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
                     & CanClimbSteps()
                     & (CanUseAbilityParakarry() | CanUseAbilityKooper())
                 )
-                | (CanClimbSteps & Has("GF_KPA16_ShutOffLava"))
+                | (CanClimbSteps() & Has("GF_KPA16_ShutOffLava"))
             ),
             "BC Lava Channel 3 On Island 2": HasBoots() & Has("GF_KPA16_ShutOffLava"),
         },
