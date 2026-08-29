@@ -481,7 +481,15 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "20",
         "map_name": "Fake Peach Hallway",
         "exits": {
-            "BC Blue Fire Bridge": None,
+            "BC Blue Fire Bridge": OptionFilter(
+                BowserCastleMode,
+                BowserCastleMode.option_Boss_Rush,
+                operator="ne",
+            ),
+            "SSS Riding Star Ship Scene": OptionFilter(
+                BowserCastleMode,
+                BowserCastleMode.option_Boss_Rush
+            ),
             "BC Guard Door 3": (
                 HasBoots()
                 | HasHammer()
@@ -497,7 +505,15 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_name": "Ship Enter/Exit Scenes",
         "exits": {
             "SSS Riding Star Ship Scene": None,
-            "BC Hangar": None,
+            "BC Hangar": OptionFilter(
+                BowserCastleMode,
+                BowserCastleMode.option_Boss_Rush,
+                operator="ne",
+            ),
+            "BC Fake Peach Hallway": OptionFilter(
+                BowserCastleMode,
+                BowserCastleMode.option_Boss_Rush,
+            ),
         }
     },
     {
