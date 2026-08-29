@@ -4,10 +4,10 @@ from rule_builder.rules import (
     #And,
     #Or,
     #AtLeast,
-    True_,
+    #True_,
     #False_,
     Has,
-    HasAll,
+    #HasAll,
     #HasAny,
     #HasAllCounts,
     #HasAnyCount,
@@ -24,14 +24,14 @@ from rule_builder.rules import (
 
 from .LogicHelpers import (
     HasHammer,
-    HasSuperHammer,
-    HasUltraHammer,
+    #HasSuperHammer,
+    #HasUltraHammer,
     HasBoots,
     HasSuperBoots,
     HasUltraBoots,
-    CanFlipPanels,
+    #CanFlipPanels,
     CanSeeHiddenBlocks,
-    CanShakeTrees,
+    #CanShakeTrees,
     CanUseAbilityKooper,
     CanUseAbilityBombette,
     CanUseAbilityParakarry,
@@ -39,16 +39,16 @@ from .LogicHelpers import (
     CanUseAbilityWatt,
     CanUseAbilitySushie,
     CanUseAbilityLakilester,
-    CanHitGroundedBlocks,
+    #CanHitGroundedBlocks,
     CanHitFloatingBlocks,
-    CanHitGroundedSwitches,
+    #CanHitGroundedSwitches,
     CanClimbSteps,
-    CanReenterVerticalPipes,
+    #CanReenterVerticalPipes,
     CanOpenStarWay,
-    HasStarBeamRequirements,
+    #HasStarBeamRequirements,
 )
 
-from ...options import BowserDoorQuiz
+from ...options import BowserCastleMode, BowserDoorQuiz
 
 bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
     {
@@ -352,7 +352,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "13",
         "map_name": "Lower Grand Hall",
         "exits": {
-            "BC Guard Door 1": None,
+            "BC Guard Door 1": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Guard Door 2": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
             "BC Stairs to East Upper Jail": None,
             "BC Lower Grand Hall Upper": HasBoots(),
         }
@@ -385,7 +386,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "14",
         "map_name": "Upper Grand Hall",
         "exits": {
-            "BC Split Level Hall": None,
+            "BC Split Level Hall": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Blue Fire Bridge": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
             "BC Ultra Shroom Timing Puzzle": None,
             "BC Upper Grand Hall Lower": None,
         }
@@ -437,7 +439,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_name": "Hall to Guard Door 1",
         "exits": {
             "BC Entry Lava Hall": None,
-            "BC Guard Door 1": None,
+            "BC Guard Door 1": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Guard Door 2": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
         }
     },
     {
@@ -447,7 +450,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_name": "Hall to Water Puzzle",
         "exits": {
             "BC Lower Grand Hall Upper": None,
-            "BC Left Water Puzzle 1F": None,
+            "BC Left Water Puzzle 1F": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Bill Blaster Hall Lower": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
         }
     },
     {
@@ -507,7 +511,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
             "BC Battlement Yellow Block Right": CanHitFloatingBlocks(),
         },
         "exits": {
-            "BC Guard Door 2": None,
+            "BC Guard Door 2": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Hidden Passage 1": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
             "BC Castle Battlement Upper Door": CanClimbSteps(),
         }
     },
@@ -530,7 +535,11 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "23",
         "map_name": "Front Door Exterior",
         "exits": {
-            "BC Entry Lava Hall": Has("Bowser Castle Key",count=1),
+            # no key needed for shortened
+            "BC Entry Lava Hall": (
+                Has("Bowser Castle Key",count=1)
+                | OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened)
+            ),
             "BC Outside Lower Jail West": None,
             "BC Hangar": None,
         }
@@ -607,14 +616,29 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "27",
         "map_name": "Guard Door 2",
         "exits": {
-            "BC Room with Hidden Door 2": None,
-            "BC Castle Battlement Lower Door": CanOpenStarWay(
-                # Expect being able to open Star Way if Anti Guys Unit's forced
-                options=[OptionFilter(
-                    BowserDoorQuiz,
-                    BowserDoorQuiz.option_Anti_Guys_Unit,
-                )],
-                filtered_resolution=True,
+            "BC Room with Hidden Door 2": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Castle Battlement Lower Door": (
+                OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla)
+                & CanOpenStarWay(
+                    # Expect being able to open Star Way if Anti Guys Unit's forced
+                    options=[OptionFilter(
+                        BowserDoorQuiz,
+                        BowserDoorQuiz.option_Anti_Guys_Unit,
+                    )],
+                    filtered_resolution=True,
+                )
+            ),
+            "BC Hall to Guard Door 1": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
+            "BC Lower Grand Hall Lower": (
+                OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened)
+                & CanOpenStarWay(
+                    # Expect being able to open Star Way if Anti Guys Unit's forced
+                    options=[OptionFilter(
+                        BowserDoorQuiz,
+                        BowserDoorQuiz.option_Anti_Guys_Unit,
+                    )],
+                    filtered_resolution=True,
+                )
             ),
         }
     },
@@ -719,7 +743,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "36",
         "map_name": "Blue Fire Bridge",
         "exits": {
-            "BC Maze Room Upper": None,
+            "BC Maze Room Upper": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Upper Grand Hall Upper": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
             "BC Fake Peach Hallway": None,
         }
     },
@@ -744,7 +769,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_name": "Hidden Passage 1",
         "exits": {
             "BC Room with Hidden Door 1": None,
-            "BC Room with Hidden Door 2": None,
+            "BC Room with Hidden Door 2": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Castle Battlement Lower Door": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
         }
     },
     {
@@ -836,7 +862,8 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "47",
         "map_name": "Bill Blaster Hall",
         "exits": {
-            "BC Right Water Puzzle 1F": None,
+            "BC Right Water Puzzle 1F": OptionFilter(BowserCastleMode, BowserCastleMode.option_Vanilla),
+            "BC Hall to Water Puzzle": OptionFilter(BowserCastleMode, BowserCastleMode.option_Shortened),
             "BC Bill Blaster Hall Upper": HasBoots(),
         }
     },
