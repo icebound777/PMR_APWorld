@@ -22,7 +22,6 @@ from .modules.random_palettes import get_randomized_palettes
 from .Regions import PMRegion, get_regions
 from .RuleParser import Rule_AST_Transformer
 from .Entrance import PMEntrance
-from .Utils import load_json_data
 from .Locations import PMLocation, location_factory, location_name_to_id
 from .ItemPool import generate_itempool
 from .items import (
@@ -374,43 +373,6 @@ class PaperMarioWorld(World):
         # Load regions
         self.load_regions()
 
-        # Load region json files
-        file_list: list = []
-        for file in pkg_resources.resource_listdir(__name__, "data/regions"):
-            if not pkg_resources.resource_isdir(__name__, "data/regions/" + file):
-                if file.endswith(".py"):
-                    print(f"Skipping {file}")
-                    continue
-                file_list.append(file)
-        file_list.sort()
-        for file in file_list:
-            readfile = True
-            match file:
-                case "bowser's_castle.json":
-                    readfile = (
-                            self.options.bowser_castle_mode.value == BowserCastleMode.option_Vanilla
-                        and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                    )
-                case "bowser's_castle_shortened.json":
-                    readfile = (
-                            self.options.bowser_castle_mode.value == BowserCastleMode.option_Shortened
-                        and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                    )
-                case "bowser's_castle_boss_rush.json":
-                    readfile = (
-                            self.options.bowser_castle_mode.value == BowserCastleMode.option_Boss_Rush
-                        and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                    )
-                case "shooting_star_summit_no_star_way.json":
-                    readfile = self.options.seed_goal.value == SeedGoal.option_Open_Star_Way
-                case "shooting_star_summit.json":
-                    readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                case "peachs_castle.json":
-                    readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-
-            if readfile:
-                self.load_regions_from_json("regions/" + file)
-
         # Connect start to chosen starting map
         start.connect(self.get_region(starting_maps[self.options.starting_map.value][1]))
 
@@ -589,73 +551,6 @@ class PaperMarioWorld(World):
                 self.set_rule(location, location.access_rule)
             for exit in region.exits:
                 self.set_rule(exit, exit.access_rule)
-
-    def load_regions_from_json(self, file_path):
-        region_json = load_json_data(file_path)
-        region: Dict[str, Any]
-        for region in region_json:
-            region_prefix = region['region_name'][:3]
-            new_region = PMRegion(
-                region['region_name'],
-                self.player,
-                self.multiworld
-            )
-            if 'map_id' in region:
-                new_region.map_id = region['map_id']
-            if 'area_id' in region:
-                new_region.font_color = region['area_id']
-            if 'map_name' in region:
-                new_region.scene = region['map_name']
-            if 'locations' in region and region_prefix not in self.excluded_areas:
-                for location, rule in region['locations'].items():
-                    if location not in self.ch_excluded_location_names:
-                        new_location = location_factory(location, self.player)
-                        new_location.parent_region = new_region
-                        new_location.rule_string = rule
-                        self.parser.parse_spot_rule(new_location)
-                        if new_location.never:
-                            # We still need to fill the location even if ALR is off.
-                            logger.debug('Unreachable location: %s', new_location.name)
-                        new_location.player = self.player
-                        new_region.locations.append(new_location)
-            if 'events' in region and region_prefix not in self.excluded_areas:
-                for event, rule in region['events'].items():
-                    # Allow duplicate placement of events
-                    lname = '%s from %s' % (event, new_region.name)
-                    new_location = PMLocation(
-                        self.player,
-                        lname,
-                        event = True,
-                        parent = new_region,
-                    )
-                    new_location.rule_string = rule
-                    self.parser.parse_spot_rule(new_location)
-                    if new_location.never:
-                        logger.debug('Dropping unreachable event: %s', new_location.name)
-                    else:
-                        new_location.player = self.player
-                        new_region.locations.append(new_location)
-                        self.make_event_item(event, new_location)
-                        new_location.show_in_spoiler = False
-            if 'exits' in region:
-                for exit, rule in region['exits'].items():
-                    new_exit = PMEntrance(
-                        self.player,
-                        self.multiworld,
-                        f"{new_region.name} -> {exit}",
-                        new_region,
-                    )
-                    new_exit.vanilla_connected_region = exit
-                    new_exit.rule_string = rule
-                    self.parser.parse_spot_rule(new_exit)
-                    if new_exit.never:
-                        logger.debug('Dropping unreachable exit: %s', new_exit.name)
-                    else:
-                        new_region.exits.append(new_exit)
-
-            self.multiworld.regions.append(new_region)
-            self.regions.append(new_region)
-            self._regions_cache[new_region.name] = new_region
 
     # Note on allow_arbitrary_name:
     # PM defines many helper items and event names that are treated
