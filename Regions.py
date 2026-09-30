@@ -123,6 +123,7 @@ def get_regions(
                     new_location = PMLocation(
                         world_player,
                         lname,
+                        keyname = event_name,
                         event = True,
                         parent = new_region,
                     )

@@ -547,7 +547,7 @@ class PaperMarioWorld(World):
             self._regions_cache[region.name] = region
             for location in region.locations:
                 if location.event is not None and location.event:
-                    self.make_event_item(location.name, location)
+                    _ = self.make_event_item(location.keyname, location)
                 self.set_rule(location, location.access_rule)
             for exit in region.exits:
                 self.set_rule(exit, exit.access_rule)
@@ -558,7 +558,7 @@ class PaperMarioWorld(World):
     # files. This means we need to create items for any name.
     # Allowing any item name to be created is dangerous in case of plando, so
     # this is a middle ground.
-    def create_item(self, name: str, allow_arbitrary_name: bool = False):
+    def create_item(self, name: str, allow_arbitrary_name: bool = False) -> PMItem:
         if name in item_table:
             return PMItem(
                 name,
@@ -575,7 +575,7 @@ class PaperMarioWorld(World):
             )
         raise Exception(f"Invalid item name: {name}")
 
-    def make_event_item(self, name, location, item=None):
+    def make_event_item(self, name, location, item=None) -> PMItem:
         if item is None:
             item = self.create_item(name, allow_arbitrary_name=True)
         self.multiworld.push_item(location, item, collect=False)
