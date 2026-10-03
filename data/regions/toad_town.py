@@ -212,7 +212,7 @@ toad_town_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
                 "RF_CanCook",
                 "Cookbook",
                 "Koopa Leaf",
-                "Dried_Pasta",
+                "Dried Pasta",
             ),
             "AF_CanMakeKookyCookie": HasAll("RF_CanCook", "Cookbook", "Koopa Leaf", "Cake Mix"),
             "AF_CanMakeLifeShroom": (
