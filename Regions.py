@@ -143,6 +143,13 @@ def get_regions(
                     new_region.locations.append(new_location)
             elif "exits" == entry_key:
                 for exit_name, rule in region_entry["exits"].items():
+                    if (    seed_goal == SeedGoal.option_Open_Star_Way
+                        and exit_name == "SSS Star Way"
+                    ):
+                        # Don't create Star Way connection if Star Way doesn't
+                        # even exist in this seed
+                        continue
+
                     new_exit = PMEntrance(
                         world_player,
                         multiworld,
