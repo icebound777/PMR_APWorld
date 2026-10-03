@@ -33,7 +33,8 @@ class PMLocation(Location):
         price_index=None,
         parent=None,
         internal=False,
-        event=None
+        event=None,
+        event_name=None,
     ):
         super(PMLocation, self).__init__(player, name, code, parent)
         self.identifier = identifier
@@ -49,6 +50,7 @@ class PMLocation(Location):
         self.never = False
         self.disabled = False
         self.event = event
+        self.event_name = event_name
         self.internal = internal
 
 

@@ -123,8 +123,8 @@ def get_regions(
                     new_location = PMLocation(
                         world_player,
                         lname,
-                        keyname = event_name,
                         event = True,
+                        event_name = event_name,
                         parent = new_region,
                     )
                     if rule is not None:
