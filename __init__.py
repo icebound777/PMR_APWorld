@@ -39,7 +39,7 @@ from .data.ItemList import (
 )
 from .data.itemlocation_special import limited_by_item_areas
 from .data.itemlocation_replenish import replenishing_itemlocations
-from .data.LocationsList import location_table, location_groups, ch8_locations
+from .data.LocationsList import location_table, location_groups, all_ch8_locations
 from .modules.random_actor_stats import get_shuffled_chapter_difficulty
 from .Rules import set_rules
 from .modules.random_partners import get_rnd_starting_partners
@@ -330,7 +330,7 @@ class PaperMarioWorld(World):
                 )
 
         if self.options.seed_goal.value == SeedGoal.option_Open_Star_Way:
-            self.ch_excluded_location_names.extend(ch8_locations)
+            self.ch_excluded_location_names.extend(all_ch8_locations)
 
         # set power star counts to 0 if option is not being used
         if not self.options.power_star_hunt.value:
