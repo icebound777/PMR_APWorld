@@ -29,6 +29,7 @@ from .data.regions.peachs_castle import peachs_castle_regions
 from .data.regions.shooting_star_summit import shooting_star_summit_regions
 from .data.regions.shiver_region import shiver_region_regions
 from .data.regions.shy_guys_toybox import shy_guys_toybox_regions
+from .data.regions.star_haven import star_haven_regions
 from .data.regions.toad_town_tunnels import toad_town_tunnels_regions
 from .data.regions.toad_town import toad_town_regions
 from .data.regions.tubbas_castle import tubbas_castle_regions
@@ -80,6 +81,7 @@ def get_regions(
 
     if seed_goal != SeedGoal.option_Open_Star_Way:
         # Open Star Way makes Peach's Castle unreachable
+        optionfiltered_regions.extend(star_haven_regions)
         optionfiltered_regions.extend(peachs_castle_regions)
 
     for region_entry in optionfiltered_regions:
