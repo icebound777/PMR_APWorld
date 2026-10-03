@@ -54,7 +54,6 @@ def get_regions(
     optionfiltered_regions: list[Dict[str, str | Dict[str, Rule | None]]] = []
     for region_data in [
         boos_mansion_regions,
-        bowsers_castle_regions,
         crystal_palace_regions,
         dry_dry_desert_regions,
         dry_dry_outpost_regions,
@@ -80,8 +79,9 @@ def get_regions(
         optionfiltered_regions.extend(region_data)
 
     if seed_goal != SeedGoal.option_Open_Star_Way:
-        # Open Star Way makes Peach's Castle unreachable
+        # Open Star Way makes chapter 8 unreachable
         optionfiltered_regions.extend(star_haven_regions)
+        optionfiltered_regions.extend(bowsers_castle_regions)
         optionfiltered_regions.extend(peachs_castle_regions)
 
     for region_entry in optionfiltered_regions:
