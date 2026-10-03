@@ -1,8 +1,17 @@
 # Changelog
 
-## 0.6.7
+## next version
 
 ### Other
+
+* Migrate logic to AP's RuleBuilder system
+  * This change aims to make maintaining and understanding the logic easier.
+* Manifest
+  * Add `"minimum_ap_version": "0.6.7"` to the manifest, as Archipelago version 0.6.7 or newer is required for the newly added Rule Builder system
+
+## 0.6.7
+
+### Other (0.6.7)
 
 * AP data for trackers
   * Add bouncing of the player's current location in the game world, so trackers and other tools can access this information live.
