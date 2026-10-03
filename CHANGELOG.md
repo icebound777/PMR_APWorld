@@ -1,8 +1,15 @@
 # Changelog
 
-## 0.6.7
+## next version
 
 ### Other
+
+* AI usage disclaimer
+  * Added an AI usage disclaimer block to the README file.
+
+## 0.6.7
+
+### Other (0.6.7)
 
 * AP data for trackers
   * Add bouncing of the player's current location in the game world, so trackers and other tools can access this information live.
