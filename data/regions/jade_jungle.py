@@ -266,7 +266,7 @@ jade_jungle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
             "JJ NE Jungle (Raven Statue) Underwater": CanUseAbilitySushie(),
         },
         "exits": {
-            "JJ Deep Jungle 1": Has("Jade_Raven"),
+            "JJ Deep Jungle 1": Has("Jade Raven"),
             "JJ NE Jungle (Raven Statue) East": CanUseAbilitySushie(),
             "JJ NE Jungle (Raven Statue) South": CanUseAbilitySushie(),
         }
