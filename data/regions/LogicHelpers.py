@@ -255,31 +255,31 @@ class CanOpenStarWay(Rule["PaperMarioWorld"], game="Paper Mario"):
         has_required_spirits: Rule = (
             Has(
                 "STARSPIRIT_1",
-                count=1 if FromWorldAttr("require_eldstar") else 0
+                count=FromWorldAttr("require_eldstar")
             )
             & Has(
                 "STARSPIRIT_2",
-                count=1 if FromWorldAttr("require_mamar") else 0
+                count=FromWorldAttr("require_mamar")
             )
             & Has(
                 "STARSPIRIT_3",
-                count=1 if FromWorldAttr("require_skolar") else 0
+                count=FromWorldAttr("require_skolar")
             )
             & Has(
                 "STARSPIRIT_4",
-                count=1 if FromWorldAttr("require_muskular") else 0
+                count=FromWorldAttr("require_muskular")
             )
             & Has(
                 "STARSPIRIT_5",
-                count=1 if FromWorldAttr("require_misstar") else 0
+                count=FromWorldAttr("require_misstar")
             )
             & Has(
                 "STARSPIRIT_6",
-                count=1 if FromWorldAttr("require_klevar") else 0
+                count=FromWorldAttr("require_klevar")
             )
             & Has(
                 "STARSPIRIT_7",
-                count=1 if FromWorldAttr("require_kalmar") else 0
+                count=FromWorldAttr("require_kalmar")
             )
         )
 

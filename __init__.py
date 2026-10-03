@@ -151,13 +151,13 @@ class PaperMarioWorld(World):
         self.entrance_list = []
 
         self.required_spirits = []
-        self.require_eldstar: bool = False
-        self.require_mamar: bool = False
-        self.require_skolar: bool = False
-        self.require_muskular: bool = False
-        self.require_misstar: bool = False
-        self.require_klevar: bool = False
-        self.require_kalmar: bool = False
+        self.require_eldstar: int = 0
+        self.require_mamar: int = 0
+        self.require_skolar: int = 0
+        self.require_muskular: int = 0
+        self.require_misstar: int = 0
+        self.require_klevar: int = 0
+        self.require_kalmar: int = 0
 
         self.excluded_spirits = []
         self.excluded_areas = []
@@ -308,19 +308,19 @@ class PaperMarioWorld(World):
 
             # workaround for data/regions/LogicHelpers.py > CanOpenStarWay
             if 1 in self.required_spirits:
-                self.require_eldstar = True
+                self.require_eldstar = 1
             if 2 in self.required_spirits:
-                self.require_mamar = True
+                self.require_mamar = 1
             if 3 in self.required_spirits:
-                self.require_skolar = True
+                self.require_skolar = 1
             if 4 in self.required_spirits:
-                self.require_muskular = True
+                self.require_muskular = 1
             if 5 in self.required_spirits:
-                self.require_misstar = True
+                self.require_misstar = 1
             if 6 in self.required_spirits:
-                self.require_klevar = True
+                self.require_klevar = 1
             if 7 in self.required_spirits:
-                self.require_kalmar = True
+                self.require_kalmar = 1
 
             if self.options.spirit_requirements.value == SpiritRequirements.option_Specific_And_Limit_Chapter_Logic:
                 self.excluded_spirits = remaining_spirits
