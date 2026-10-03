@@ -13,7 +13,11 @@ from .modules.random_battles import get_boss_battles
 from .SettingsString import load_settings_from_site_string
 from worlds.AutoWorld import World, WebWorld
 from . import Locations, options
-from .data.chapter_logic import areas_by_chapter, get_chapter_excluded_location_names
+from .data.chapter_logic import (
+    areas_by_chapter,
+    get_bowser_castle_removed_locations,
+    get_chapter_excluded_location_names,
+)
 from .modules.modify_entrances import get_bowser_rush_pairs, get_bowser_shortened_pairs
 from .modules.random_audio import get_randomized_audio
 from .modules.random_map_mirroring import get_mirrored_map_list
@@ -329,8 +333,13 @@ class PaperMarioWorld(World):
                     self.options.letter_rewards.value,
                 )
 
+        # depending on options, partially or fully remove chapter 8 locations
         if self.options.seed_goal.value == SeedGoal.option_Open_Star_Way:
             self.ch_excluded_location_names.extend(all_ch8_locations)
+        else:
+            self.ch_excluded_location_names.extend(
+                get_bowser_castle_removed_locations(self.options.bowser_castle_mode.value)
+            )
 
         # set power star counts to 0 if option is not being used
         if not self.options.power_star_hunt.value:
