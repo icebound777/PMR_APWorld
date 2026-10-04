@@ -2,6 +2,11 @@
 
 ## next version
 
+### Changes to existing features
+
+* Death Link
+  * Since the option is not actually implemented yet, it has now been removed from the options list. This should no longer show the option in generated YAML files.
+
 ### Other
 
 * AI usage disclaimer

@@ -5,7 +5,6 @@ Option definitions for Paper Mario 64
 from Options import (
     Choice,
     Range,
-    DeathLink,
     Toggle,
     DefaultOnToggle,
     FreeText,
@@ -1232,5 +1231,3 @@ class PaperMarioOptions(PerGameCommonOptions):
     mute_danger_beeps: MuteDangerBeeps
 
     pmr_settings_string: PMRSiteSettingsString
-
-    death_link: DeathLink
