@@ -9,6 +9,10 @@
 
 ### Other
 
+* Migrate logic to AP's RuleBuilder system
+  * This change aims to make maintaining and understanding the logic easier.
+* Manifest
+  * Add `"minimum_ap_version": "0.6.7"` to the manifest, as Archipelago version 0.6.7 or newer is required for the newly added Rule Builder system
 * AI usage disclaimer
   * Added an AI usage disclaimer block to the README file.
 

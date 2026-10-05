@@ -1,3 +1,5 @@
+from typing import List
+
 from BaseClasses import Location
 from .data.LocationsList import location_table
 
@@ -31,7 +33,8 @@ class PMLocation(Location):
         price_index=None,
         parent=None,
         internal=False,
-        event=None
+        event=None,
+        event_name=None,
     ):
         super(PMLocation, self).__init__(player, name, code, parent)
         self.identifier = identifier
@@ -47,11 +50,12 @@ class PMLocation(Location):
         self.never = False
         self.disabled = False
         self.event = event
+        self.event_name = event_name
         self.internal = internal
 
 
 # used when loading regions from json to create location objects
-def location_factory(locations, player: int):
+def location_factory(locations, player: int) -> PMLocation | List[PMLocation]:
     ret = []
     singleton = False
 

@@ -1,8 +1,7 @@
 import settings
-import typing
 import os
 import logging
-from typing import Dict, Any, TextIO
+from typing import Dict, Any, TextIO, Union, ClassVar
 from BaseClasses import (
     Tutorial,
     CollectionState,
@@ -14,16 +13,19 @@ from .modules.random_battles import get_boss_battles
 from .SettingsString import load_settings_from_site_string
 from worlds.AutoWorld import World, WebWorld
 from . import Locations, options
-from .data.chapter_logic import areas_by_chapter, get_chapter_excluded_location_names
+from .data.chapter_logic import (
+    areas_by_chapter,
+    get_bowser_castle_removed_locations,
+    get_chapter_excluded_location_names,
+)
 from .modules.modify_entrances import get_bowser_rush_pairs, get_bowser_shortened_pairs
 from .modules.random_audio import get_randomized_audio
 from .modules.random_map_mirroring import get_mirrored_map_list
 from .modules.random_movecosts import get_randomized_moves
 from .modules.random_palettes import get_randomized_palettes
-from .Regions import PMRegion
+from .Regions import PMRegion, get_regions
 from .RuleParser import Rule_AST_Transformer
 from .Entrance import PMEntrance
-from .Utils import load_json_data
 from .Locations import PMLocation, location_factory, location_name_to_id
 from .ItemPool import generate_itempool
 from .items import (
@@ -41,7 +43,7 @@ from .data.ItemList import (
 )
 from .data.itemlocation_special import limited_by_item_areas
 from .data.itemlocation_replenish import replenishing_itemlocations
-from .data.LocationsList import location_table, location_groups, ch8_locations
+from .data.LocationsList import location_table, location_groups, all_ch8_locations
 from .modules.random_actor_stats import get_shuffled_chapter_difficulty
 from .Rules import set_rules
 from .modules.random_partners import get_rnd_starting_partners
@@ -90,7 +92,7 @@ class PaperMarioSettings(settings.Group):
         """
 
     rom_file: RomFile = RomFile(RomFile.copy_to)
-    rom_start: typing.Union[RomStart, bool] = True
+    rom_start: Union[RomStart, bool] = True
 
 
 # information for the supported games setup guide; set up to make it easier to
@@ -126,7 +128,7 @@ class PaperMarioWorld(World):
     options: PaperMarioOptions
 
     settings_key = "paper_mario_settings"
-    settings: typing.ClassVar[PaperMarioSettings]
+    settings: ClassVar[PaperMarioSettings]
 
     item_name_to_id = {
         item_name: pm_data_to_ap_id(data, False)
@@ -149,6 +151,14 @@ class PaperMarioWorld(World):
         self.entrance_list = []
 
         self.required_spirits = []
+        self.require_eldstar: int = 0
+        self.require_mamar: int = 0
+        self.require_skolar: int = 0
+        self.require_muskular: int = 0
+        self.require_misstar: int = 0
+        self.require_klevar: int = 0
+        self.require_kalmar: int = 0
+
         self.excluded_spirits = []
         self.excluded_areas = []
         self.ch_excluded_locations = []
@@ -291,13 +301,26 @@ class PaperMarioWorld(World):
 
             # determine which star spirits are needed
             remaining_spirits = [i for i in range(1, 8)]
-            chosen_spirits = []
 
             for _ in range(self.options.star_way_spirits.value):
                 rnd_spirit = self.random.randint(0, len(remaining_spirits) - 1)
-                chosen_spirits.append(remaining_spirits.pop(rnd_spirit))
+                self.required_spirits.append(remaining_spirits.pop(rnd_spirit))
 
-            self.required_spirits = chosen_spirits
+            # workaround for data/regions/LogicHelpers.py > CanOpenStarWay
+            if 1 in self.required_spirits:
+                self.require_eldstar = 1
+            if 2 in self.required_spirits:
+                self.require_mamar = 1
+            if 3 in self.required_spirits:
+                self.require_skolar = 1
+            if 4 in self.required_spirits:
+                self.require_muskular = 1
+            if 5 in self.required_spirits:
+                self.require_misstar = 1
+            if 6 in self.required_spirits:
+                self.require_klevar = 1
+            if 7 in self.required_spirits:
+                self.require_kalmar = 1
 
             if self.options.spirit_requirements.value == SpiritRequirements.option_Specific_And_Limit_Chapter_Logic:
                 self.excluded_spirits = remaining_spirits
@@ -310,8 +333,13 @@ class PaperMarioWorld(World):
                     self.options.letter_rewards.value,
                 )
 
+        # depending on options, partially or fully remove chapter 8 locations
         if self.options.seed_goal.value == SeedGoal.option_Open_Star_Way:
-            self.ch_excluded_location_names.extend(ch8_locations)
+            self.ch_excluded_location_names.extend(all_ch8_locations)
+        else:
+            self.ch_excluded_location_names.extend(
+                get_bowser_castle_removed_locations(self.options.bowser_castle_mode.value)
+            )
 
         # set power star counts to 0 if option is not being used
         if not self.options.power_star_hunt.value:
@@ -351,35 +379,8 @@ class PaperMarioWorld(World):
         menu.exits.append(start)
         self.multiworld.regions.append(menu)
 
-        # Load region json files
-        for file in pkg_resources.resource_listdir(__name__, "data/regions"):
-            if not pkg_resources.resource_isdir(__name__, "data/regions/" + file):
-                readfile = True
-                match file:
-                    case "bowser's_castle.json":
-                        readfile = (
-                                self.options.bowser_castle_mode.value == BowserCastleMode.option_Vanilla
-                            and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                        )
-                    case "bowser's_castle_shortened.json":
-                        readfile = (
-                                self.options.bowser_castle_mode.value == BowserCastleMode.option_Shortened
-                            and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                        )
-                    case "bowser's_castle_boss_rush.json":
-                        readfile = (
-                                self.options.bowser_castle_mode.value == BowserCastleMode.option_Boss_Rush
-                            and self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                        )
-                    case "shooting_star_summit_no_star_way.json":
-                        readfile = self.options.seed_goal.value == SeedGoal.option_Open_Star_Way
-                    case "shooting_star_summit.json":
-                        readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-                    case "peachs_castle.json":
-                        readfile = self.options.seed_goal.value != SeedGoal.option_Open_Star_Way
-
-                if readfile:
-                    self.load_regions_from_json("regions/" + file)
+        # Load regions
+        self.load_regions()
 
         # Connect start to chosen starting map
         start.connect(self.get_region(starting_maps[self.options.starting_map.value][1]))
@@ -540,72 +541,25 @@ class PaperMarioWorld(World):
             )
             loc.parent_region.locations.remove(loc)
 
-    def load_regions_from_json(self, file_path):
-        region_json = load_json_data(file_path)
-        region: Dict[str, Any]
-        for region in region_json:
-            region_prefix = region['region_name'][:3]
-            new_region = PMRegion(
-                region['region_name'],
-                self.player,
-                self.multiworld
-            )
-            if 'map_id' in region:
-                new_region.map_id = region['map_id']
-            if 'area_id' in region:
-                new_region.font_color = region['area_id']
-            if 'map_name' in region:
-                new_region.scene = region['map_name']
-            if 'locations' in region and region_prefix not in self.excluded_areas:
-                for location, rule in region['locations'].items():
-                    if location not in self.ch_excluded_location_names:
-                        new_location = location_factory(location, self.player)
-                        new_location.parent_region = new_region
-                        new_location.rule_string = rule
-                        self.parser.parse_spot_rule(new_location)
-                        if new_location.never:
-                            # We still need to fill the location even if ALR is off.
-                            logger.debug('Unreachable location: %s', new_location.name)
-                        new_location.player = self.player
-                        new_region.locations.append(new_location)
-            if 'events' in region and region_prefix not in self.excluded_areas:
-                for event, rule in region['events'].items():
-                    # Allow duplicate placement of events
-                    lname = '%s from %s' % (event, new_region.name)
-                    new_location = PMLocation(
-                        self.player,
-                        lname,
-                        event = True,
-                        parent = new_region,
-                    )
-                    new_location.rule_string = rule
-                    self.parser.parse_spot_rule(new_location)
-                    if new_location.never:
-                        logger.debug('Dropping unreachable event: %s', new_location.name)
-                    else:
-                        new_location.player = self.player
-                        new_region.locations.append(new_location)
-                        self.make_event_item(event, new_location)
-                        new_location.show_in_spoiler = False
-            if 'exits' in region:
-                for exit, rule in region['exits'].items():
-                    new_exit = PMEntrance(
-                        self.player,
-                        self.multiworld,
-                        f"{new_region.name} -> {exit}",
-                        new_region,
-                    )
-                    new_exit.vanilla_connected_region = exit
-                    new_exit.rule_string = rule
-                    self.parser.parse_spot_rule(new_exit)
-                    if new_exit.never:
-                        logger.debug('Dropping unreachable exit: %s', new_exit.name)
-                    else:
-                        new_region.exits.append(new_exit)
-
-            self.multiworld.regions.append(new_region)
-            self.regions.append(new_region)
-            self._regions_cache[new_region.name] = new_region
+    def load_regions(self):
+        # Call get_regions generator function to get all regions that are
+        # defined as python files
+        for region in get_regions(
+            self.player,
+            self.multiworld,
+            self.excluded_areas,
+            self.ch_excluded_location_names,
+            self.options.seed_goal,
+        ):
+            self.multiworld.regions.append(region)
+            self.regions.append(region)
+            self._regions_cache[region.name] = region
+            for location in region.locations:
+                if location.event is not None and location.event:
+                    _ = self.make_event_item(location.event_name, location)
+                self.set_rule(location, location.access_rule)
+            for exit in region.exits:
+                self.set_rule(exit, exit.access_rule)
 
     # Note on allow_arbitrary_name:
     # PM defines many helper items and event names that are treated
@@ -613,7 +567,7 @@ class PaperMarioWorld(World):
     # files. This means we need to create items for any name.
     # Allowing any item name to be created is dangerous in case of plando, so
     # this is a middle ground.
-    def create_item(self, name: str, allow_arbitrary_name: bool = False):
+    def create_item(self, name: str, allow_arbitrary_name: bool = False) -> PMItem:
         if name in item_table:
             return PMItem(
                 name,
@@ -630,7 +584,7 @@ class PaperMarioWorld(World):
             )
         raise Exception(f"Invalid item name: {name}")
 
-    def make_event_item(self, name, location, item=None):
+    def make_event_item(self, name, location, item=None) -> PMItem:
         if item is None:
             item = self.create_item(name, allow_arbitrary_name=True)
         self.multiworld.push_item(location, item, collect=False)

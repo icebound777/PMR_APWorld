@@ -22,7 +22,7 @@ from .data.LocationsList import (
     location_table,
     missable_locations,
     dojo_location_order,
-    ch8_locations,
+    all_ch8_locations,
 )
 from .options import *
 from .data.item_exclusion import (
@@ -90,7 +90,7 @@ def get_pool_core(world: "PaperMarioWorld"):
     # otherwise remove any bowser castle locations removed by shortened or boss
     # rush modes
     if world.options.seed_goal.value == SeedGoal.option_Open_Star_Way:
-        ch_excluded_locations.extend(ch8_locations)
+        ch_excluded_locations.extend(all_ch8_locations)
         ch_excluded_items.extend(get_chapter_excluded_item_names([8]))
     else:
         bc_removed_locations = get_bowser_castle_removed_locations(
@@ -591,7 +591,7 @@ def get_locations_to_exclude(
     # excluded is a problem or not
     # exclude some amount of chapter 8 locations depending upon access requirements
     # if world.options.seed_goal.value != SeedGoal.option_Open_Star_Way:
-    #     late_game_locations = ch8_locations.copy()
+    #     late_game_locations = all_ch8_locations.copy()
     #     for bc_loc in bc_removed_locations:
     #         late_game_locations.remove(bc_loc)
     #
