@@ -14,7 +14,11 @@
 * Manifest
   * Add `"minimum_ap_version": "0.6.7"` to the manifest, as Archipelago version 0.6.7 or newer is required for the newly added Rule Builder system
 * AI usage disclaimer
-  * Added an AI usage disclaimer block to the README file.
+  * Add an AI usage disclaimer block to the README file.
+* More tracker data
+  * Add the following slot data for trackers to read:
+    * `kent_c_koopa` option value
+    * `bowser_door_quiz` option value
 
 ## 0.6.7
 

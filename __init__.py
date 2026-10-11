@@ -1076,7 +1076,9 @@ class PaperMarioWorld(World):
             "hidden_block_mode": self.options.hidden_block_mode.value,
             "cook_without_frying_pan": self.options.cook_without_frying_pan.value,
             "merlow_rewards_pricing": self.options.merlow_rewards_pricing.value,
-            "required_spirits": self.required_spirits
+            "required_spirits": self.required_spirits,
+            "kent_c_koopa": self.options.kent_c_koopa.value,
+            "bowser_door_quiz": self.options.bowser_door_quiz.value,
         }
 
     def modify_multidata(self, multidata: dict):
