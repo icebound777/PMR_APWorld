@@ -7,6 +7,10 @@
 * Death Link
   * Since the option is not actually implemented yet, it has now been removed from the options list. This should no longer show the option in generated YAML files.
 
+### Bugfixes/Corrections
+
+* Fix logic sometimes considering some Rowf, Koopa Koot, and Dojo locations as excluded, even if 5 or more star spirits were required to beat the seed. This would happen if the number of spirits needed to open Star Way was below 5, but the number of spirits required for the Star Beam item location was 5 or higher.
+
 ### Other
 
 * Migrate logic to AP's RuleBuilder system

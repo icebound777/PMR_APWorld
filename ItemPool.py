@@ -584,7 +584,12 @@ def get_locations_to_exclude(
     # needed to beat the seed
     if not world.options.power_star_hunt.value:
         excluded_locations.extend(
-            get_locations_beyond_spirit_requirements(world.options.star_way_spirits.value)
+            get_locations_beyond_spirit_requirements(
+                max([
+                    world.options.star_way_spirits.value,
+                    world.options.star_beam_spirits.value,
+                ])
+            )
         )
 
     # below lines turned off to see if letting late game locations not be
