@@ -1015,7 +1015,7 @@ class PaperMarioWorld(World):
     # Specifically ensures that only real items are gotten, not any events.
     def get_state_with_complete_itempool(self):
         all_state = CollectionState(self.multiworld)
-        for item in self.itempool + self.pre_fill_items:
+        for item in self.itempool + self.pre_fill_items + self.dro_shop_puzzle_items:
             self.multiworld.worlds[item.player].collect(all_state, item)
         all_state.stale[self.player] = True
 
