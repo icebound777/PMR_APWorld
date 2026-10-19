@@ -9,7 +9,7 @@
 
 ### Bugfixes/Corrections
 
-* Fix consumable items in the Dry Dry Outpost shop not being considered logical progression, even if they are required for beating the seed. This most often manifested in seeds failing to generate when setting `RandomPuzzles` to `True` and `ConsumableItemPool` to `mystery_only`.
+* Fix consumable items in the Dry Dry Outpost shop not being considered logical progression, even if they are required for beating the seed. This only manifested in seeds failing to generate when setting `RandomPuzzles` to `True` and `ConsumableItemPool` to `mystery_only`.
 * Fix logic sometimes considering some Rowf, Koopa Koot, and Dojo locations as excluded, even if 5 or more star spirits were required to beat the seed. This would happen if the number of spirits needed to open Star Way was below 5, but the number of spirits required for the Star Beam item location was 5 or higher.
 
 ### Other
