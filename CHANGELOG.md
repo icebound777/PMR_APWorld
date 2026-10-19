@@ -1,6 +1,6 @@
 # Changelog
 
-## next version
+## 0.6.8
 
 ### Changes to existing features
 
