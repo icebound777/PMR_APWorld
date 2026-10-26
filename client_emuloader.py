@@ -13,6 +13,11 @@ import Utils
 
 from emu_loader import EmuLoaderClient
 
+from .data.data import *
+from .data.ItemList import item_multiples_ids
+from .Locations import location_name_to_id
+from .items import item_id_prefix
+
 if TYPE_CHECKING:
     from kvui import UILog
 
@@ -135,8 +140,7 @@ async def emu_loader_monitor_task(ctx: PaperMarioContext):
             try:
                 # per tick game logic here
                 #logger.info("<game loop tick>")
-                #await game_watcher(ctx)
-                None
+                await game_watcher(ctx)
 
             except Exception as e:
                 print("Paper Mario Connector lost its connection; reconnecting...")
@@ -156,6 +160,123 @@ async def emu_loader_monitor_task(ctx: PaperMarioContext):
                 return
             except asyncio.TimeoutError:
                 pass
+
+
+async def game_watcher(ctx: PaperMarioContext):
+    def read_list_u8(client: PaperMarioEmuLoaderClient, address: int, count: int = 1) -> List[int]:
+        u8_list: List[int] = []
+
+        for i in range(count):
+            u8_list.append(client.read_u8(address + 0x80000000 + i))
+
+        return u8_list
+
+
+    client = ctx.emu_loader
+
+    print("CHECK OVERWORLD STATE")
+    # check for current state before sending or receiving anything
+    game_mode = client.read_u8(MODE_ADDRESS + 0x80000000)
+    if game_mode != GAME_MODE_WORLD:
+        # We're not in an "overworld" game state: don't read or write data
+        #logger.info(f"we're not in an overworld state: {game_mode=}")
+        return
+
+    # BOUNCE TRACKER DATA
+    print("BOUNCE TRACKER DATA")
+    (current_area_id, current_map_id) = (
+        client.read_u8(AREA_ADDRESS + 0x80000000),
+        client.read_u8(MAP_ADDRESS + 0x80000000),
+    )
+
+    if (   ctx.pm_game_state.current_area_id != current_area_id
+        or ctx.pm_game_state.current_map_id != current_map_id
+    ):
+        ctx.pm_game_state.current_area_id = current_area_id
+        ctx.pm_game_state.current_map_id = current_map_id
+
+        await ctx.send_msgs([{
+            "cmd": "Bounce",
+            "slots": [ctx.slot],
+            "data": {
+                "type": "MapUpdate",
+                "areaId": current_area_id,
+                "mapId": current_map_id,
+            },
+        }])
+
+
+    # READ UNIQUE ITEM REGISTRY
+    print("READ UNIQUE ITEM REGISTRY")
+    uir_flags: list = read_list_u8(client, UIR_START_ADDRESS, len(item_table))
+
+
+    # RECEIVE ITEMS
+    print("RECEIVE ITEMS")
+    # Add item(s) to buffer as u16 int(s)
+    received_items = client.read_u16(ITM_RCV_SEQ + 0x80000000)
+    #logger.info(f"{received_items=}")
+
+    if received_items < len(ctx.items_received):
+        can_receive_items = client.read_u16(KEY_RECV_BUFFER + 0x80000000) == 0
+
+        if can_receive_items:
+            print(f"{ctx.items_received=}")
+            next_item = ctx.items_received[received_items]
+            item_id = next_item.item - item_id_prefix
+            if item_id in item_multiples_ids.keys():
+                repeat_id = 0
+
+                # magical seeds need to skip seed 1 if only 3 seeds
+                # required, 1 and 2 if 2 seeds required, etc
+                if item_id == item_table["Magical Seed"][2]:
+                    repeat_id = min(
+                        4 - ctx.slot_data["magical_seeds"],
+                        3 # maximum of 3 in case command used
+                    )
+
+                base_item_id = item_id
+                item_id = item_multiples_ids[base_item_id][repeat_id]
+                while (    repeat_id < len(item_multiples_ids[base_item_id])
+                        and uir_flags[item_id]
+                ):
+                    item_id = item_multiples_ids[base_item_id][repeat_id]
+                    repeat_id += 1
+
+            client.write_u16(KEY_RECV_BUFFER + 0x80000000, item_id)
+
+
+    # SEND ITEMS
+    print("SEND ITEMS")
+    mf_bytes = bytearray(read_list_u8(client, MF_START_ADDRESS, 0x224))
+    gf_bytes = bytearray(read_list_u8(client, GF_START_ADDRESS, 0x107))
+    locs_to_send: Set[int] = set()
+
+    # check through the checks table for checked checks
+    for location, data in checks_table.items():
+        loc_id = location_name_to_id[location]
+        loc_is_checked = False
+
+        # these flags are weird and require a helper function to do
+        # funny math, refer to doc linked in data
+        if data[0] == "MF":
+            loc_is_checked = get_flag_value(data[1], mf_bytes)
+        elif data[0] == "GF":
+            loc_is_checked = get_flag_value(data[1], gf_bytes)
+
+        if loc_is_checked and loc_id in ctx.server_locations:
+            locs_to_send.add(loc_id)
+
+    # Send locations if there are any to send
+    if locs_to_send != ctx.pm_game_state.local_checked_locations:
+        ctx.pm_game_state.local_checked_locations = locs_to_send
+
+        if locs_to_send is not None:
+            await ctx.send_msgs([{
+                "cmd": "LocationChecks",
+                "locations": list(locs_to_send)
+            }])
+
 
 def main():
     Utils.init_logging("Paper Mario Client")
