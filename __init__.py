@@ -9,6 +9,12 @@ from BaseClasses import (
     ItemClassification as ic,
     LocationProgressType,
     )
+from worlds.LauncherComponents import (
+    Component,
+    Type,
+    launch_subprocess,
+    components,
+)
 from .modules.random_battles import get_boss_battles
 from .SettingsString import load_settings_from_site_string
 from worlds.AutoWorld import World, WebWorld
@@ -73,8 +79,22 @@ from .data.starting_maps import starting_maps
 from .Rom import generate_output, PaperMarioProcedurePatch
 from Fill import fill_restrictive, remaining_fill
 import pkg_resources
-from .client import PaperMarioClient  # unused but required for generic client to hook onto
+#from .client import PaperMarioClient  # unused but required for generic client to hook onto
 logger = logging.getLogger("Paper Mario")
+
+
+def run_client():
+    from .client_emuloader import main
+    launch_subprocess(main)
+
+
+components.append(
+    Component(
+        "Paper Mario Client",
+        func=run_client,
+        component_type=Type.CLIENT,
+    )
+)
 
 
 class PaperMarioSettings(settings.Group):
