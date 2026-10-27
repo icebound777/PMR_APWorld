@@ -4,6 +4,8 @@
 
 ### Other
 
+* Map Names
+  * Fix typo: Rename `Koopa Bros.' Fortress` map `Right Starway` to `Right Stairway`.
 * YAML options
   * `Cutscene Mode` now defaults to `Minimal`.
 
