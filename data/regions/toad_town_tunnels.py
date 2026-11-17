@@ -8,7 +8,7 @@ from rule_builder.rules import (
     #Or,
     #AtLeast,
     True_,
-    #False_,
+    False_,
     Has,
     #HasAll,
     HasAny,
@@ -32,17 +32,17 @@ from .LogicHelpers import (
     HasBoots,
     HasSuperBoots,
     HasUltraBoots,
-    CanFlipPanels,
+    #CanFlipPanels,
     CanSeeHiddenBlocks,
-    CanShakeTrees,
-    CanUseAbilityKooper,
+    #CanShakeTrees,
+    #CanUseAbilityKooper,
     CanUseAbilityBombette,
     CanUseAbilityParakarry,
-    CanUseAbilityBow,
-    CanUseAbilityWatt,
+    #CanUseAbilityBow,
+    #CanUseAbilityWatt,
     CanUseAbilitySushie,
     CanUseAbilityLakilester,
-    CanHitGroundedBlocks,
+    #CanHitGroundedBlocks,
     CanHitFloatingBlocks,
     CanHitGroundedSwitches,
     CanClimbSteps,
@@ -528,12 +528,12 @@ toad_town_tunnels_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "events": {
             "RF_BuiltCh7Bridge": (
                 (HasUltraBoots() & CanSeeHiddenBlocks())
-                | HasSuperBoots(
+                | False_(
                     options=[OptionFilter(
                         Chapter7BridgeVisible,
-                        True
+                        False
                     )],
-                    filtered_resolution=False,
+                    filtered_resolution=True,
                 )
             ),
         },
