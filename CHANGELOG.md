@@ -19,6 +19,8 @@
     * Fix `BC Lava Channel 3 On Island 2` only being considered reachable with the boots, even though Parakarry suffices.
   * Misc
     * Minor fixes and adjustments to logic all over the place. These include removing redundant progress checks (which may speed up seed generation), and proper fixes that will only matter once glitch options or entrance shuffle are available.
+* Automated AP Tests
+  * Fix several test fails this apworld caused during the `general` set of automated AP tests.
 
 ### Other
 
