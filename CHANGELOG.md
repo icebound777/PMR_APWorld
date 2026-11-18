@@ -5,6 +5,8 @@
 ### Bugfixes/Corrections
 
 * Logic
+  * Toad Town
+    * Fix `Open Blue House: True` not actually doing anything logically, and still expecting finding the `OddKey` to open the house from the outside.
   * Toad Town Tunnels
     * Fix logic erroneously requiring `SuperBoots` for building the chapter 7 block bridge if `Chapter 7 bridge visible` was turned on. This fix will now put chapter 7 in logic much earlier if the bridge is always visible.
   * Shooting Star Summit

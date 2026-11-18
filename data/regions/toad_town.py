@@ -194,7 +194,14 @@ toad_town_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "3",
         "map_name": "Southern District",
         "events": {
-            "GF_MAC02_UnlockedHouse": Has("Odd Key"),
+            "GF_MAC02_UnlockedHouse": Has(
+                "Odd Key",
+                options=[OptionFilter(
+                    OpenBlueHouse,
+                    False
+                )],
+                filtered_resolution=True,
+            ),
             "RF_CanCook": Has(
                 "Frying Pan",
                 options=[OptionFilter(
