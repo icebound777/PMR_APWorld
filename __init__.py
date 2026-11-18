@@ -397,6 +397,15 @@ class PaperMarioWorld(World):
         elif self.options.bowser_castle_mode.value == BowserCastleMode.option_Shortened:
             self.entrance_list = get_bowser_shortened_pairs()
 
+        # Remove option-specific item locations
+        if self.options.open_forest.value:
+            loc = self.multiworld.get_location(
+                "TT Southern District Fice T. Forest Pass",
+                self.player
+            )
+            loc.parent_region.locations.remove(loc)
+
+
     def create_items(self) -> None:
         # This checks what locations are being included, gets those items, places non-shuffled items,
         # adds any desired beta items and badges, ensures we have the correct number of items by
@@ -510,14 +519,8 @@ class PaperMarioWorld(World):
             else:
                 self.trappable_item_names.extend(item_groups["PartnerUpgrade"])
 
-
-    def set_rules(self) -> None:
-        set_rules(self)
-
-    def generate_basic(self):
-        self.auth = bytearray(self.multiworld.random.getrandbits(8) for _ in range(16))
-
         # remove internal event locations that are not going to exist in this seed
+        # we can only do this here, otherwise we cannot call `get_state_with_complete_itempool`
         all_state = self.get_state_with_complete_itempool()
         all_locations = self.get_locations()
         all_state.sweep_for_advancements(locations=all_locations)
@@ -533,12 +536,12 @@ class PaperMarioWorld(World):
         for loc in unreachable:
             loc.parent_region.locations.remove(loc)
 
-        if self.options.open_forest.value:
-            loc = self.multiworld.get_location(
-                "TT Southern District Fice T. Forest Pass",
-                self.player
-            )
-            loc.parent_region.locations.remove(loc)
+
+    def set_rules(self) -> None:
+        set_rules(self)
+
+    def generate_basic(self):
+        self.auth = bytearray(self.multiworld.random.getrandbits(8) for _ in range(16))
 
     def load_regions(self):
         # Call get_regions generator function to get all regions that are
