@@ -6,6 +6,7 @@
 
 * YAML options
   * `Cutscene Mode` now defaults to `Minimal`.
+  * `Chet Rippo Available` now defaults to `True`.
 
 ## 0.6.8
 

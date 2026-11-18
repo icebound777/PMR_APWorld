@@ -393,7 +393,7 @@ class MerlowRewardsPricing(Choice):
     option_Vanilla = 1
 
 
-class ChetRippoAvailable(Toggle):
+class ChetRippoAvailable(DefaultOnToggle):
     """Determines if Chet Rippo, the shady NPC who you can pay to reallocate Mario's stats, appears in Toad Town."""
     display_name = "Chet Rippo Available"
 
