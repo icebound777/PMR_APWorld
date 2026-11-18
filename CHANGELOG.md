@@ -2,8 +2,28 @@
 
 ## next version
 
+### Bugfixes/Corrections
+
+* Logic
+  * Toad Town
+    * Fix `Open Blue House: True` not actually doing anything logically, and still expecting finding the `OddKey` to open the house from the outside.
+  * Toad Town Tunnels
+    * Fix logic erroneously requiring `SuperBoots` for building the chapter 7 block bridge if `Chapter 7 bridge visible` was turned on. This fix will now put chapter 7 in logic much earlier if the bridge is always visible.
+  * Shooting Star Summit
+    * Fix reaching the top of the summit being in logic while jumpless with Parakarry. Logic now expects the `Boots`.
+  * Mt. Rugged
+    * Fix the train station bushes logically requiring `Boots` to reach.
+  * Bowser's Castle
+    * Fix the basement jail / lava channels area being logically reachable without `Watt`.
+    * Fix `BC Lava Channel 3 On Island 1` being considered reachable without the boots while the lava is still active.
+    * Fix `BC Lava Channel 3 On Island 2` only being considered reachable with the boots, even though Parakarry suffices.
+  * Misc
+    * Minor fixes and adjustments to logic all over the place. These include removing redundant progress checks (which may speed up seed generation), and proper fixes that will only matter once glitch options or entrance shuffle are available.
+
 ### Other
 
+* Map Names
+  * Fix typo: Rename `Koopa Bros.' Fortress` map `Right Starway` to `Right Stairway`.
 * YAML options
   * `Cutscene Mode` now defaults to `Minimal`.
   * `Chet Rippo Available` now defaults to `True`.
