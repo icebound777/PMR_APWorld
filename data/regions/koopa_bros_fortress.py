@@ -24,26 +24,26 @@ from rule_builder.rules import (
 
 from .LogicHelpers import (
     HasHammer,
-    HasSuperHammer,
-    HasUltraHammer,
+    #HasSuperHammer,
+    #HasUltraHammer,
     HasBoots,
-    HasSuperBoots,
-    HasUltraBoots,
-    CanFlipPanels,
-    CanSeeHiddenBlocks,
-    CanShakeTrees,
+    #HasSuperBoots,
+    #HasUltraBoots,
+    #CanFlipPanels,
+    #CanSeeHiddenBlocks,
+    #CanShakeTrees,
     CanUseAbilityKooper,
     CanUseAbilityBombette,
     CanUseAbilityParakarry,
-    CanUseAbilityBow,
-    CanUseAbilityWatt,
-    CanUseAbilitySushie,
-    CanUseAbilityLakilester,
-    CanHitGroundedBlocks,
+    #CanUseAbilityBow,
+    #CanUseAbilityWatt,
+    #CanUseAbilitySushie,
+    #CanUseAbilityLakilester,
+    #CanHitGroundedBlocks,
     CanHitFloatingBlocks,
     CanHitGroundedSwitches,
     CanClimbSteps,
-    CanReenterVerticalPipes,
+    #CanReenterVerticalPipes,
 )
 
 koopa_bros_fortress_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
@@ -137,7 +137,6 @@ koopa_bros_fortress_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "exits": {
             "KBF Left Tower 1F": None,
             "KBF Central Hall 1F": None,
-            "KBF Left Stairway 1F Platform": Has("MF_TRD02_LoweredStairs") & HasBoots(),
             "KBF Left Stairway 2F": Has("MF_TRD02_LoweredStairs") & HasBoots(),
         }
     },
@@ -147,7 +146,7 @@ koopa_bros_fortress_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_id": "2",
         "map_name": "Left Stairway",
         "events": {
-            "MF_TRD02_LoweredStairs": CanHitGroundedBlocks(),
+            "MF_TRD02_LoweredStairs": CanHitGroundedSwitches(),
         },
         "exits": {
             "KBF Left Tower 2F": Has("Koopa Fortress Key", count=4),
@@ -179,7 +178,7 @@ koopa_bros_fortress_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
             "KBF Central Hall Left Cell": None,
         },
         "exits": {
-            "KBF Left Stairway 1F Platform": CanClimbSteps(),
+            "KBF Left Stairway 1F Platform": Has("RF_TRD_02_OpenedLeftJail"),
         }
     },
     {
@@ -259,6 +258,7 @@ koopa_bros_fortress_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         "map_name": "Right Stairway",
         "exits": {
             "KBF Central Hall 2F Right Door": Has("Koopa Fortress Key", count=3),
+            "KBF Right Stairway 1F": None,
             "KBF Right Tower": None,
         }
     },
