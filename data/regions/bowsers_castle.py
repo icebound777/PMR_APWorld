@@ -608,6 +608,7 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
                 & CanUseAbilityLakilester()
                 & CanUseAbilityParakarry()
                 & CanUseAbilityBow()
+                & CanUseAbilityWatt()
             ),
             "BC Lower Grand Hall Lower": Has("RF_Ch8_FirstGuardDoor"),
             "BC Guard Door 1 North Exit": Has("RF_Ch8_FirstGuardDoor"),
