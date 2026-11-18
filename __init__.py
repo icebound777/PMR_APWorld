@@ -72,7 +72,6 @@ from .data.node import Node
 from .data.starting_maps import starting_maps
 from .Rom import generate_output, PaperMarioProcedurePatch
 from Fill import fill_restrictive, remaining_fill
-import pkg_resources
 from .client import PaperMarioClient  # unused but required for generic client to hook onto
 logger = logging.getLogger("Paper Mario")
 
