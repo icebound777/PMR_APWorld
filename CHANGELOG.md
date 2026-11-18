@@ -2,6 +2,12 @@
 
 ## next version
 
+### Bugfixes/Corrections
+
+* Logic
+  * Toad Town Tunnels
+    * Fix logic erroneously requiring `SuperBoots` for building the chapter 7 block bridge if `Chapter 7 bridge visible` was turned on. This fix will now put chapter 7 in logic much earlier if the bridge is always visible.
+
 ### Other
 
 * Map Names
