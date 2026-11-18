@@ -85,7 +85,7 @@ shooting_star_summit_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
         },
         "exits": {
             "SSS Shooting Star Path East Upper Exit": None,
-            "SSS Shooting Star Summit": CanClimbSteps(),
+            "SSS Shooting Star Summit": HasBoots(),
         }
     },
     {

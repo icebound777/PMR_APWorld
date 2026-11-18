@@ -7,6 +7,8 @@
 * Logic
   * Toad Town Tunnels
     * Fix logic erroneously requiring `SuperBoots` for building the chapter 7 block bridge if `Chapter 7 bridge visible` was turned on. This fix will now put chapter 7 in logic much earlier if the bridge is always visible.
+  * Shooting Star Summit
+    * Fix reaching the top of the summit being in logic while jumpless with Parakarry. Logic now expects the `Boots`.
   * Mt. Rugged
     * Fix the train station bushes logically requiring `Boots` to reach.
   * Bowser's Castle
