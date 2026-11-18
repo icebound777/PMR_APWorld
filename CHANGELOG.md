@@ -7,6 +7,9 @@
 * Logic
   * Toad Town Tunnels
     * Fix logic erroneously requiring `SuperBoots` for building the chapter 7 block bridge if `Chapter 7 bridge visible` was turned on. This fix will now put chapter 7 in logic much earlier if the bridge is always visible.
+  * Bowser's Castle
+    * Fix `BC Lava Channel 3 On Island 1` being considered reachable without the boots while the lava is still active.
+    * Fix `BC Lava Channel 3 On Island 2` only being considered reachable with the boots, even though Parakarry suffices.
 
 ### Other
 

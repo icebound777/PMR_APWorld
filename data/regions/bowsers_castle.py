@@ -266,12 +266,12 @@ bowsers_castle_regions: list[Dict[str, str | Dict[str, Rule | None]]] = [
             "BC Lava Channel 3 On Island 1": (
                 (
                     CanUseAbilityLakilester()
-                    & CanClimbSteps()
-                    & (CanUseAbilityParakarry() | CanUseAbilityKooper())
+                    & (CanUseAbilityKooper() | CanUseAbilityParakarry())
+                    & HasBoots()
                 )
                 | (CanClimbSteps() & Has("GF_KPA16_ShutOffLava"))
             ),
-            "BC Lava Channel 3 On Island 2": HasBoots() & Has("GF_KPA16_ShutOffLava"),
+            "BC Lava Channel 3 On Island 2": CanClimbSteps() & Has("GF_KPA16_ShutOffLava"),
         },
         "exits": {
             "BC Lava Channel 2 East": None,
