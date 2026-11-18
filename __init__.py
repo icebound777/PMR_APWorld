@@ -997,6 +997,17 @@ class PaperMarioWorld(World):
             state.prog_items[self.player]["Star Piece"] += 1
         return super().collect(state, item)
 
+    def remove(self, state: CollectionState, item: PMItem) -> bool:
+        if item.name == "3x Star Pieces":
+            state.prog_items[self.player]["Star Piece"] -= 3
+        # Quizmo star pieces are events that can exist in multiple places,
+        # format "StarPiece_MAC_1"
+        elif (    item.name.startswith("StarPiece_")
+              and state.prog_items[self.player][item.name] == 1
+        ):
+            state.prog_items[self.player]["Star Piece"] -= 1
+        return super().remove(state, item)
+
     def get_locations(self):
         return self.multiworld.get_locations(self.player)
 
