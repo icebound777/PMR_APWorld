@@ -1,8 +1,18 @@
 # Changelog
 
-## 0.6.9
+## 0.6.10
 
 ### Bugfixes/Corrections
+
+* `Open Forever Forest` option
+  * Fix broken seed generation when this option was turned on.
+  * Fix this option being off by default.
+* `Damage Trap` items counting as being part of the `Consumables` item group
+  * This caused issues when plando'ing consumables into shop locations, as shops cannot hold item traps. So `Damage Trap`s now have no associated item group at all.
+
+## 0.6.9
+
+### Bugfixes/Corrections (0.6.9)
 
 * Logic
   * Toad Town
@@ -22,7 +32,7 @@
 * Automated AP Tests
   * Fix several test fails this apworld caused during the `general` set of automated AP tests.
 
-### Other
+### Other (0.6.9)
 
 * Map Names
   * Fix typo: Rename `Koopa Bros.' Fortress` map `Right Starway` to `Right Stairway`.

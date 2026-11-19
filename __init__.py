@@ -397,14 +397,6 @@ class PaperMarioWorld(World):
         elif self.options.bowser_castle_mode.value == BowserCastleMode.option_Shortened:
             self.entrance_list = get_bowser_shortened_pairs()
 
-        # Remove option-specific item locations
-        if self.options.open_forest.value:
-            loc = self.multiworld.get_location(
-                "TT Southern District Fice T. Forest Pass",
-                self.player
-            )
-            loc.parent_region.locations.remove(loc)
-
 
     def create_items(self) -> None:
         # This checks what locations are being included, gets those items, places non-shuffled items,
@@ -534,6 +526,14 @@ class PaperMarioWorld(World):
                and loc not in reachable
         ]
         for loc in unreachable:
+            loc.parent_region.locations.remove(loc)
+
+        # Remove option-specific item locations
+        if self.options.open_forest.value:
+            loc = self.multiworld.get_location(
+                "TT Southern District Fice T. Forest Pass",
+                self.player
+            )
             loc.parent_region.locations.remove(loc)
 
 

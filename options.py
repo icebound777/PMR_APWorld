@@ -685,7 +685,7 @@ class OpenMtRugged(Toggle):
     display_name = "Open Mt. Rugged"
 
 
-class OpenForest(Toggle):
+class OpenForest(DefaultOnToggle):
     """When enabled, Oakley allows you through Forever Forest with no requirements.
     When disabled, Oakley only allows you through once you have a Forest Pass (added randomizer item), and Fice T's
     cutscene will have an item check.
