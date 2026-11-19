@@ -1,8 +1,15 @@
 # Changelog
 
-## 0.6.9
+## 0.6.10
 
 ### Bugfixes/Corrections
+
+* `Open Forever Forest` option
+  * Fix broken seed generation when this option was turned on.
+
+## 0.6.9
+
+### Bugfixes/Corrections (0.6.9)
 
 * Logic
   * Toad Town
@@ -22,7 +29,7 @@
 * Automated AP Tests
   * Fix several test fails this apworld caused during the `general` set of automated AP tests.
 
-### Other
+### Other (0.6.9)
 
 * Map Names
   * Fix typo: Rename `Koopa Bros.' Fortress` map `Right Starway` to `Right Stairway`.
