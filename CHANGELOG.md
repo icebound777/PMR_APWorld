@@ -7,6 +7,8 @@
 * `Open Forever Forest` option
   * Fix broken seed generation when this option was turned on.
   * Fix this option being off by default.
+* `Damage Trap` items counting as being part of the `Consumables` item group
+  * This caused issues when plando'ing consumables into shop locations, as shops cannot hold item traps. So `Damage Trap`s now have no associated item group at all.
 
 ## 0.6.9
 
