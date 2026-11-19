@@ -6,6 +6,7 @@
 
 * `Open Forever Forest` option
   * Fix broken seed generation when this option was turned on.
+  * Fix this option being off by default.
 
 ## 0.6.9
 
