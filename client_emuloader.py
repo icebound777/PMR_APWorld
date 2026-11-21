@@ -15,6 +15,7 @@ from emu_loader import EmuLoaderClient
 
 from .data.data import *
 from .data.ItemList import item_multiples_ids
+from .data.LocationsList import location_groups, location_table
 from .Locations import location_name_to_id
 from .items import item_id_prefix
 
@@ -46,11 +47,15 @@ def rom_is_ready_for_communication(client: EmuLoaderClient) -> bool:
 
 class PaperMarioGameState():
     local_checked_locations: Set[int]
+    autohint_stored: Set[int]
+    autohint_released: Set[int]
     current_area_id: Optional[int]
     current_map_id: Optional[int]
 
     def __init__(self):
         self.local_checked_locations = set()
+        self.autohint_stored = set()
+        self.autohint_released = set()
         self.current_area_id = 1 # Toad Town
         self.current_map_id = 0 # Debug Room
 
@@ -184,24 +189,24 @@ async def game_watcher(ctx: PaperMarioContext):
 
     # BOUNCE TRACKER DATA
     print("BOUNCE TRACKER DATA")
-    (current_area_id, current_map_id) = (
-        client.read_u8(AREA_ADDRESS + 0x80000000),
-        client.read_u8(MAP_ADDRESS + 0x80000000),
+    current_location = (
+        client.read_u8(AREA_ADDRESS + 0x80000000), # current_area_id
+        client.read_u8(MAP_ADDRESS + 0x80000000),  # current_map_id
     )
 
-    if (   ctx.pm_game_state.current_area_id != current_area_id
-        or ctx.pm_game_state.current_map_id != current_map_id
+    if (   ctx.pm_game_state.current_area_id != current_location[0]
+        or ctx.pm_game_state.current_map_id != current_location[1]
     ):
-        ctx.pm_game_state.current_area_id = current_area_id
-        ctx.pm_game_state.current_map_id = current_map_id
+        ctx.pm_game_state.current_area_id = current_location[0]
+        ctx.pm_game_state.current_map_id = current_location[1]
 
         await ctx.send_msgs([{
             "cmd": "Bounce",
             "slots": [ctx.slot],
             "data": {
                 "type": "MapUpdate",
-                "areaId": current_area_id,
-                "mapId": current_map_id,
+                "areaId": ctx.pm_game_state.current_area_id,
+                "mapId": ctx.pm_game_state.current_map_id,
             },
         }])
 
@@ -272,6 +277,58 @@ async def game_watcher(ctx: PaperMarioContext):
 
         if locs_to_send is not None:
             await ctx.check_locations(list(locs_to_send))
+
+
+    # AUTO HINTING
+    # Build list of items to scout
+    hints: List[int] = []
+    for loc in location_groups["AutoHint"]:
+        if loc not in ctx.pm_game_state.autohint_released.union(ctx.pm_game_state.autohint_stored):
+            if current_location == (location_table[loc][2], location_table[loc][3]):
+                # don't hint Rowf items you can't see/buy yet
+                if current_location == (1, 2): # area TT, map TT plaza
+                    # grab the set number from the location name
+                    rowf_set = int(loc[len("TT Plaza District Rowf's Shop Set ")])
+                    star_spirits = client.read_u8(STAR_SPIRITS_COUNT + 0x80000000)
+
+                    if rowf_set <= star_spirits + 1:
+                        hints.append(loc)
+                else:
+                    hints.append(loc)
+
+    # make sure we aren't scouting anything that's already been checked
+    hints = [
+        location_name_to_id[loc]
+        for loc in hints
+        if     location_name_to_id[loc] in ctx.missing_locations
+           and location_name_to_id[loc] not in ctx.locations_checked
+    ]
+
+    # scout the auto hint locations in the current map and store
+    # what we have scouted but not hinted
+    if hints:
+        await ctx.send_msgs([{
+            "cmd": "LocationScouts",
+            "locations": hints,
+            "create_as_hint": 0,
+        }])
+        ctx.pm_game_state.autohint_stored = set(hints)
+
+    # send the hints for the unsent progression items in the stored
+    # locations
+    # these will have already been scouted
+    if ctx.pm_game_state.autohint_stored:
+        await ctx.send_msgs([{
+            "cmd": "LocationScouts",
+            "locations": [
+                loc
+                for loc, n_item in ctx.locations_info.items()
+                if n_item.flags & 0b001
+            ],
+            "create_as_hint": 2,
+        }])
+        ctx.pm_game_state.autohint_released.update(ctx.pm_game_state.autohint_stored)
+        ctx.pm_game_state.autohint_stored = set()
 
 
 def main():
