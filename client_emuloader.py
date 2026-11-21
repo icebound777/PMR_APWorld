@@ -9,6 +9,7 @@ from CommonClient import (
     gui_enabled,
     logger,
 )
+from NetUtils import ClientStatus
 import Utils
 
 from emu_loader import EmuLoaderClient
@@ -329,6 +330,13 @@ async def game_watcher(ctx: PaperMarioContext):
         }])
         ctx.pm_game_state.autohint_released.update(ctx.pm_game_state.autohint_stored)
         ctx.pm_game_state.autohint_stored = set()
+
+    # GOAL CHECKING
+    if not ctx.finished_game and (get_flag_value(GOAL_FLAG, mf_bytes)):
+        await ctx.send_msgs([{
+            "cmd": "StatusUpdate",
+            "status": ClientStatus.CLIENT_GOAL
+        }])
 
 
 def main():
