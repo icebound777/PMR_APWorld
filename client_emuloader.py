@@ -215,14 +215,13 @@ async def game_watcher(ctx: PaperMarioContext):
     print("RECEIVE ITEMS")
     # Add item(s) to buffer as u16 int(s)
     received_items = client.read_u16(ITM_RCV_SEQ + 0x80000000)
-    #logger.info(f"{received_items=}")
+    non_local_items_received: List = [x for x in ctx.items_received if x.player != ctx.slot]
 
-    if received_items < len(ctx.items_received):
+    if received_items < len(non_local_items_received):
         can_receive_items = client.read_u16(KEY_RECV_BUFFER + 0x80000000) == 0
 
         if can_receive_items:
-            print(f"{ctx.items_received=}")
-            next_item = ctx.items_received[received_items]
+            next_item = non_local_items_received[received_items]
             item_id = next_item.item - item_id_prefix
             if item_id in item_multiples_ids.keys():
                 repeat_id = 0
@@ -272,10 +271,7 @@ async def game_watcher(ctx: PaperMarioContext):
         ctx.pm_game_state.local_checked_locations = locs_to_send
 
         if locs_to_send is not None:
-            await ctx.send_msgs([{
-                "cmd": "LocationChecks",
-                "locations": list(locs_to_send)
-            }])
+            await ctx.check_locations(list(locs_to_send))
 
 
 def main():
