@@ -35,6 +35,7 @@ AUTH_ADDRESS = 0x1D00000 - 16
 # ROM and RAM values
 MAGIC_VALUE = 0x504D4442 # b'PMDB'
 GAME_MODE_WORLD = 4
+SIGNATURE_OFFSET_DEV = 0x4770A0
 
 
 def get_uir_address(name):

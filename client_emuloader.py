@@ -26,7 +26,7 @@ from .items import item_id_prefix
 
 
 MAX_ITEMS_RECEIVED_AT_ONCE: int = 128
-
+SIGNATURE_OFFSET = SIGNATURE_OFFSET_DEV
 
 
 class PaperMarioEmuLoaderClient(EmuLoaderClient):
@@ -34,7 +34,7 @@ class PaperMarioEmuLoaderClient(EmuLoaderClient):
     def __init__(self) -> None:
         #logger.info("Attempting to init EmuLoader")
         super().__init__(
-            signature_offset=0x4770A0,
+            signature_offset=SIGNATURE_OFFSET,
             signature_value=MAGIC_VALUE,
             pull_from_web=False,
         )
@@ -44,7 +44,7 @@ def rom_is_ready_for_communication(client: EmuLoaderClient) -> bool:
     # The randomized ROM is only considered ready while the rando-specific
     # magic value is present
     try:
-        rando_magic_value = client.read_u32(0x4770A0 + 0x80000000)
+        rando_magic_value = client.read_u32(SIGNATURE_OFFSET + 0x80000000)
 
         return rando_magic_value == MAGIC_VALUE
     except Exception:
