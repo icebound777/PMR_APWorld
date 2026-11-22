@@ -12,7 +12,7 @@ from BaseClasses import (
 from worlds.LauncherComponents import (
     Component,
     Type,
-    launch_subprocess,
+    launch,
     components,
     SuffixIdentifier,
 )
@@ -84,9 +84,9 @@ import pkg_resources
 logger = logging.getLogger("Paper Mario")
 
 
-def run_client():
+def run_client(*args):
     from .client_emuloader import main
-    launch_subprocess(main)
+    launch(main, name="PaperMarioClient", args=args)
 
 
 components.append(

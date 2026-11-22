@@ -13,6 +13,7 @@ from NetUtils import (
     ClientStatus,
     NetworkItem,
 )
+import Patch
 import Utils
 
 from emu_loader import EmuLoaderClient
@@ -367,13 +368,36 @@ async def game_watcher(ctx: PaperMarioContext):
         }])
 
 
-def main():
+def _patch_game(patch_file: str) -> Patch.RomMeta | None:
+    try:
+        metadata, _ = Patch.create_rom_file(patch_file)
+        #Utils.async_start(_run_game(output_file))
+        return metadata
+    except Exception as exc:
+        logger.exception(exc)
+        Utils.messagebox("Error Patching Game", str(exc), True)
+        return None
+
+
+def main(*launch_args: str):
     Utils.init_logging("Paper Mario Client")
     parser = get_base_parser()
-    args = sys.argv[1:]  # the default for parse_args()
+    parser.add_argument(
+        "patch_file",
+        default="",
+        type=str,
+        nargs="?",
+        help="Path to an Archipelago patch file"
+    )
+    args = launch_args
     if "Paper Mario Client" in args:
         args.remove("Paper Mario Client")
     args = parser.parse_args(args)
+
+    if args.patch_file != "":
+        metadata = _patch_game(args.patch_file)
+        if metadata is not None and "server" in metadata:
+            args.connect = metadata["server"]
 
     async def _main():
         multiprocessing.freeze_support()
