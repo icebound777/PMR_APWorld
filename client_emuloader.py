@@ -9,7 +9,10 @@ from CommonClient import (
     gui_enabled,
     logger,
 )
-from NetUtils import ClientStatus
+from NetUtils import (
+    ClientStatus,
+    NetworkItem,
+)
 import Utils
 
 from emu_loader import EmuLoaderClient
@@ -22,6 +25,10 @@ from .items import item_id_prefix
 
 if TYPE_CHECKING:
     from kvui import UILog
+
+
+MAX_ITEMS_RECEIVED_AT_ONCE: int = 128
+
 
 
 class PaperMarioEmuLoaderClient(EmuLoaderClient):
@@ -177,6 +184,11 @@ async def game_watcher(ctx: PaperMarioContext):
 
         return u8_list
 
+    def write_list_u16(client: PaperMarioEmuLoaderClient, address: int, u16_list: List[int]):
+        for i, u16_val in enumerate(u16_list):
+            #print(f"Writing {hex(u16_val)} to {hex(address + 0x80000000 + (2*i))}")
+            client.write_u16(address + 0x80000000 + (2*i), u16_val)
+
 
     client = ctx.emu_loader
 
@@ -219,36 +231,43 @@ async def game_watcher(ctx: PaperMarioContext):
 
     # RECEIVE ITEMS
     print("RECEIVE ITEMS")
-    # Add item(s) to buffer as u16 int(s)
-    received_items = client.read_u16(ITM_RCV_SEQ + 0x80000000)
-    non_local_items_received: List = [x for x in ctx.items_received if x.player != ctx.slot]
+    can_receive_items = client.read_u16(KEY_RECV_BUFFER + 0x80000000) == 0
+    if can_receive_items:
+        # Add item(s) to buffer as u16 int(s)
+        received_items = client.read_u16(ITM_RCV_SEQ + 0x80000000)
+        non_local_items_received: List = [x for x in ctx.items_received if x.player != ctx.slot]
 
-    if received_items < len(non_local_items_received):
-        can_receive_items = client.read_u16(KEY_RECV_BUFFER + 0x80000000) == 0
+        if received_items < len(non_local_items_received):
+            new_items: List[NetworkItem] = non_local_items_received[received_items:]
+            if len(new_items) > MAX_ITEMS_RECEIVED_AT_ONCE:
+                new_items = new_items[:MAX_ITEMS_RECEIVED_AT_ONCE]
 
-        if can_receive_items:
-            next_item = non_local_items_received[received_items]
-            item_id = next_item.item - item_id_prefix
-            if item_id in item_multiples_ids.keys():
-                repeat_id = 0
 
-                # magical seeds need to skip seed 1 if only 3 seeds
-                # required, 1 and 2 if 2 seeds required, etc
-                if item_id == item_table["Magical Seed"][2]:
-                    repeat_id = min(
-                        4 - ctx.slot_data["magical_seeds"],
-                        3 # maximum of 3 in case command used
-                    )
+            new_items_ids: List[int] = [x.item - item_id_prefix for x in new_items]
 
-                base_item_id = item_id
-                item_id = item_multiples_ids[base_item_id][repeat_id]
-                while (    repeat_id < len(item_multiples_ids[base_item_id])
-                        and uir_flags[item_id]
-                ):
+            for i, item_id in enumerate(new_items_ids):
+                if item_id in item_multiples_ids.keys():
+                    repeat_id = 0
+
+                    # magical seeds need to skip seed 1 if only 3 seeds
+                    # required, 1 and 2 if 2 seeds required, etc
+                    if item_id == item_table["Magical Seed"][2]:
+                        repeat_id = min(
+                            4 - ctx.slot_data["magical_seeds"],
+                            3 # maximum of 3 in case command used
+                        )
+
+                    base_item_id = item_id
                     item_id = item_multiples_ids[base_item_id][repeat_id]
-                    repeat_id += 1
+                    while (    repeat_id < len(item_multiples_ids[base_item_id])
+                            and uir_flags[item_id]
+                            and item_id in new_items_ids
+                    ):
+                        item_id = item_multiples_ids[base_item_id][repeat_id]
+                        repeat_id += 1
+                    new_items_ids[i] = item_id
 
-            client.write_u16(KEY_RECV_BUFFER + 0x80000000, item_id)
+            write_list_u16(client, KEY_RECV_BUFFER, new_items_ids)
 
 
     # SEND ITEMS
@@ -330,6 +349,7 @@ async def game_watcher(ctx: PaperMarioContext):
         }])
         ctx.pm_game_state.autohint_released.update(ctx.pm_game_state.autohint_stored)
         ctx.pm_game_state.autohint_stored = set()
+
 
     # GOAL CHECKING
     if not ctx.finished_game and (get_flag_value(GOAL_FLAG, mf_bytes)):
