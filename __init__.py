@@ -14,6 +14,7 @@ from worlds.LauncherComponents import (
     Type,
     launch_subprocess,
     components,
+    SuffixIdentifier,
 )
 from .modules.random_battles import get_boss_battles
 from .SettingsString import load_settings_from_site_string
@@ -93,6 +94,7 @@ components.append(
         "Paper Mario Client",
         func=run_client,
         component_type=Type.CLIENT,
+        file_identifier=SuffixIdentifier(".appm64")
     )
 )
 
