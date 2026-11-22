@@ -1,8 +1,15 @@
 # Changelog
 
-## 0.6.10
+## next version
 
 ### Bugfixes/Corrections
+
+* Shop prices
+  * Fix `Coin Bag` items, which give 10 coins, being sold for anywhere from 10 to 30 coins. Now they always cost exactly 10 coins.
+
+## 0.6.10
+
+### Bugfixes/Corrections (0.6.10)
 
 * `Open Forever Forest` option
   * Fix broken seed generation when this option was turned on.
