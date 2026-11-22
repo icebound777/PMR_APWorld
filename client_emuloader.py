@@ -32,7 +32,7 @@ MAX_ITEMS_RECEIVED_AT_ONCE: int = 128
 class PaperMarioEmuLoaderClient(EmuLoaderClient):
 
     def __init__(self) -> None:
-        logger.info("Attempting to init EmuLoader")
+        #logger.info("Attempting to init EmuLoader")
         super().__init__(
             signature_offset=0x4770A0,
             signature_value=MAGIC_VALUE,
@@ -149,7 +149,7 @@ async def emu_loader_monitor_task(ctx: PaperMarioContext):
         ctx.emu_loader = PaperMarioEmuLoaderClient()
         ctx.pm_game_state = PaperMarioGameState()
 
-        logger.info("EmuLoader init'd, waiting for emulator connection and valid game state")
+        #logger.info("EmuLoader init'd, waiting for emulator connection and valid game state")
         await ctx.emu_loader.wait_for_emulator(validate=rom_is_ready_for_communication)
 
         if ctx.exit_event.is_set():
@@ -201,7 +201,7 @@ async def game_watcher(ctx: PaperMarioContext):
 
     client = ctx.emu_loader
 
-    print("CHECK OVERWORLD STATE")
+    #print("CHECK OVERWORLD STATE")
     # check for current state before sending or receiving anything
     game_mode = client.read_u8(MODE_ADDRESS + 0x80000000)
     if game_mode != GAME_MODE_WORLD:
@@ -210,7 +210,7 @@ async def game_watcher(ctx: PaperMarioContext):
         return
 
     # BOUNCE TRACKER DATA
-    print("BOUNCE TRACKER DATA")
+    #print("BOUNCE TRACKER DATA")
     current_location = (
         client.read_u8(AREA_ADDRESS + 0x80000000), # current_area_id
         client.read_u8(MAP_ADDRESS + 0x80000000),  # current_map_id
@@ -234,12 +234,12 @@ async def game_watcher(ctx: PaperMarioContext):
 
 
     # READ UNIQUE ITEM REGISTRY
-    print("READ UNIQUE ITEM REGISTRY")
+    #print("READ UNIQUE ITEM REGISTRY")
     uir_flags: list = read_list_u8(client, UIR_START_ADDRESS, len(item_table))
 
 
     # RECEIVE ITEMS
-    print("RECEIVE ITEMS")
+    #print("RECEIVE ITEMS")
     can_receive_items = client.read_u16(KEY_RECV_BUFFER + 0x80000000) == 0
     if can_receive_items:
         # Add item(s) to buffer as u16 int(s)
@@ -280,7 +280,7 @@ async def game_watcher(ctx: PaperMarioContext):
 
 
     # SEND ITEMS
-    print("SEND ITEMS")
+    #print("SEND ITEMS")
     mf_bytes = bytearray(read_list_u8(client, MF_START_ADDRESS, 0x224))
     gf_bytes = bytearray(read_list_u8(client, GF_START_ADDRESS, 0x107))
     locs_to_send: Set[int] = set()
