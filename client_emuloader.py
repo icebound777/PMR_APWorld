@@ -23,9 +23,6 @@ from .data.LocationsList import location_groups, location_table
 from .Locations import location_name_to_id
 from .items import item_id_prefix
 
-if TYPE_CHECKING:
-    from kvui import UILog
-
 
 MAX_ITEMS_RECEIVED_AT_ONCE: int = 128
 
@@ -98,22 +95,33 @@ class PaperMarioContext(CommonContext):
         if cmd == "Connected":
             self.slot_data = args.get("slot_data")
 
-#    def run_gui(self):
-#        from kvui import GameManager, Window, UILog
-#
-#        Window.bind(on_request_close=self.on_request_close)
-#        asyncio.create_task(patch_and_run(True))
-#
-#        class PaperMarioManager(GameManager):
-#            ctx: PaperMarioContext
-#            logging_pairs = [("Client", "Archipelago")]
-#            base_title = "Paper Mario Client for AP"
-#
-#            def build(self):
-#                return super().build()
-#
-#        self.ui = PaperMarioManager(self)
-#        self.ui_task = asyncio.create_task(self.ui.async_run(), name="UI")
+    def already_running(self) -> bool:
+        try:
+            import ctypes
+
+            mutex = ctypes.windll.kernel32.CreateMutexW(None, 1, "PM64_GUI_MUTEX")
+            return ctypes.GetLastError() == 183 # ERROR_ALREADY_EXISTS
+        except Exception:
+            return False
+
+    def run_gui(self):
+        if self.already_running():
+            sys.exit(1)
+        from kvui import GameManager #, Window
+
+        #Window.bind(on_request_close=self.on_request_close)
+        #asyncio.create_task(patch_and_run(True))
+
+        class PaperMarioManager(GameManager):
+            ctx: PaperMarioContext
+            logging_pairs = [("Client", "Archipelago")]
+            base_title = "Paper Mario Client for AP"
+
+            def build(self):
+                return super().build()
+
+        self.ui = PaperMarioManager(self)
+        self.ui_task = asyncio.create_task(self.ui.async_run(), name="UI")
 
 #    def on_request_close(self, *args: Any) -> bool:
 #        from kvui import MessageBox
