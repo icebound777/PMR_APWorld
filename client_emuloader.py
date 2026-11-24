@@ -16,7 +16,15 @@ from NetUtils import (
 import Patch
 import Utils
 
-from emu_loader import EmuLoaderClient
+# run archipelago's module update to fetch emu_loader via requirements.txt
+import ModuleUpdate
+ModuleUpdate.update()
+# For when its a global package
+try:
+    from emu_loader import EmuLoaderClient
+# For when its in the apworld itself
+except ImportError:
+    from .emu_loader import EmuLoaderClient
 
 from .data.data import *
 from .data.ItemList import item_multiples_ids
@@ -36,7 +44,7 @@ class PaperMarioEmuLoaderClient(EmuLoaderClient):
         super().__init__(
             signature_offset=SIGNATURE_OFFSET,
             signature_value=MAGIC_VALUE,
-            pull_from_web=False,
+            pull_from_web=True,
         )
 
 
