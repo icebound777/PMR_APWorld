@@ -262,9 +262,20 @@ async def game_watcher(ctx: PaperMarioContext):
 
             new_items_ids: List[int] = [x.item - item_id_prefix for x in new_items]
 
+            # Since we can have the exact same item id of "item_multiples_ids" items
+            # in the new_items_ids list, we have to keep track of the repeat_id
+            # of each of them. If didn't do this, we might add the same
+            # repeat-version of an item, leading to e.g. sending multiple
+            # "RuinsKeyA"s despite wanting to send one "RuinsKeyA",
+            # one "RuinsKeyB" and so on
+            same_item_in_received_items: Dict[int, int] = {}
+
             for i, item_id in enumerate(new_items_ids):
                 if item_id in item_multiples_ids.keys():
-                    repeat_id = 0
+                    if item_id in same_item_in_received_items:
+                        repeat_id = same_item_in_received_items[item_id] + 1
+                    else:
+                        repeat_id = 0
 
                     # magical seeds need to skip seed 1 if only 3 seeds
                     # required, 1 and 2 if 2 seeds required, etc
@@ -275,14 +286,14 @@ async def game_watcher(ctx: PaperMarioContext):
                         )
 
                     base_item_id = item_id
-                    item_id = item_multiples_ids[base_item_id][repeat_id]
                     while (    repeat_id < len(item_multiples_ids[base_item_id])
-                            and uir_flags[item_id]
-                            and item_id in new_items_ids
+                            and uir_flags[item_multiples_ids[base_item_id][repeat_id]]
                     ):
-                        item_id = item_multiples_ids[base_item_id][repeat_id]
                         repeat_id += 1
-                    new_items_ids[i] = item_id
+
+                    # overwrite item id in list with adjusted id
+                    same_item_in_received_items[item_id] = repeat_id
+                    new_items_ids[i] = item_multiples_ids[base_item_id][repeat_id]
 
             write_list_u16(client, KEY_RECV_BUFFER, new_items_ids)
 
