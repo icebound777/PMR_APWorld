@@ -76,7 +76,7 @@ class PaperMarioGameState():
 
 class PaperMarioContext(CommonContext):
     #command_processor
-    items_handling = 0b111
+    items_handling = 0b101
     want_slot_data = True
     slot_data: Dict[str, Any] | None = None
     #tab_items
@@ -252,10 +252,9 @@ async def game_watcher(ctx: PaperMarioContext):
     if can_receive_items:
         # Add item(s) to buffer as u16 int(s)
         received_items = client.read_u16(ITM_RCV_SEQ + 0x80000000)
-        non_local_items_received: List = [x for x in ctx.items_received if x.player != ctx.slot]
 
-        if received_items < len(non_local_items_received):
-            new_items: List[NetworkItem] = non_local_items_received[received_items:]
+        if received_items < len(ctx.items_received):
+            new_items: List[NetworkItem] = ctx.items_received[received_items:]
             if len(new_items) > MAX_ITEMS_RECEIVED_AT_ONCE:
                 new_items = new_items[:MAX_ITEMS_RECEIVED_AT_ONCE]
 
