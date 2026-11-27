@@ -34,7 +34,7 @@ from .Locations import location_name_to_id
 from .items import item_id_prefix
 
 
-SIGNATURE_OFFSET = SIGNATURE_OFFSET_DEV
+SIGNATURE_OFFSET = SIGNATURE_OFFSET_PROD
 
 
 class PaperMarioEmuLoaderClient(EmuLoaderClient):
