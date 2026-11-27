@@ -20,6 +20,8 @@
   * `false` When using Archipelago's `Open Patch` functionality, only patch the ROM, but do not open the Paper Mario Client. This is intended for those who want to use a different client, like the generic bizhawk one.
 * Item receiving
   * Slightly sped up item receiving, so reconnecting into an async session now only takes "long" instead of "almost forever" to receive all new items. This is going to be sped up further in future releases.
+* YAML options
+  * The description for `Random Text` now explains that it turns the text into gibberish, instead of shuffling dialogue.
 
 ## 0.6.10
 
