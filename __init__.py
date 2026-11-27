@@ -9,6 +9,13 @@ from BaseClasses import (
     ItemClassification as ic,
     LocationProgressType,
     )
+from worlds.LauncherComponents import (
+    Component,
+    Type,
+    launch,
+    components,
+    SuffixIdentifier,
+)
 from .modules.random_battles import get_boss_battles
 from .SettingsString import load_settings_from_site_string
 from worlds.AutoWorld import World, WebWorld
@@ -72,8 +79,23 @@ from .data.node import Node
 from .data.starting_maps import starting_maps
 from .Rom import generate_output, PaperMarioProcedurePatch
 from Fill import fill_restrictive, remaining_fill
-from .client import PaperMarioClient  # unused but required for generic client to hook onto
+from .client import PaperMarioClient # unused but required for generic client to hook onto
 logger = logging.getLogger("Paper Mario")
+
+
+def run_client(*args):
+    from .client_emuloader import main
+    launch(main, name="PaperMarioClient", args=args)
+
+
+components.append(
+    Component(
+        "Paper Mario Client",
+        func=run_client,
+        component_type=Type.CLIENT,
+        file_identifier=SuffixIdentifier(".appm64")
+    )
+)
 
 
 class PaperMarioSettings(settings.Group):
@@ -90,8 +112,18 @@ class PaperMarioSettings(settings.Group):
         Alternatively, a path to a program to open the .z64 file with
         """
 
+    class ClientStart(settings.Bool):
+        """
+        Set this to false to never autostart the client after patching.
+        Only do this if you want to use a client other than the emu_loader
+        based Paper Mario Client (for example if you want to use the
+        generic bizhawk client instead)
+        """
+        required = True
+
     rom_file: RomFile = RomFile(RomFile.copy_to)
     rom_start: Union[RomStart, bool] = True
+    client_start: ClientStart | bool = True
 
 
 # information for the supported games setup guide; set up to make it easier to
