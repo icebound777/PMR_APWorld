@@ -6,6 +6,8 @@
 
 * Shop prices
   * Fix `Coin Bag` items, which give 10 coins, being sold for anywhere from 10 to 30 coins. Now they always cost exactly 10 coins.
+* Item check flags
+  * Fix `Boo's Mansion - BM Super Boots Room In Big Chest` triggering as checked when opening the chest itself. The check is intended to only trigger once the boo ring minigame has concluded.
 
 ### Other
 

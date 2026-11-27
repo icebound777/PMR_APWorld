@@ -584,7 +584,7 @@ checks_table = {
     "BM Basement Shop Item 5":                                   ("MF",   0x105F),
     "BM Basement Shop Item 6":                                   ("MF",   0x1060),
 
-    "BM Super Boots Room In Big Chest":                          ("GF",   0x3C7),
+    "BM Super Boots Room In Big Chest":                          ("MF",   0x35),
     "BM Super Boots Room In Crate":                              ("GF",   0x3CA),
     "BM Super Boots Room Hidden Panel":                          ("GF",   0x3CC),
 
