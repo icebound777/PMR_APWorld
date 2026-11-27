@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING, Set, Optional, Tuple
+from typing import TYPE_CHECKING, Set, Optional, Tuple, List, Dict
 import base64
 
-from NetUtils import ClientStatus
+from NetUtils import ClientStatus, NetworkItem
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 from .data.ItemList import item_multiples_ids
@@ -44,8 +44,10 @@ class PaperMarioClient(BizHawkClient):
                 ctx.bizhawk_ctx,
                 [(TABLE_ADDRESS, 0x4, "ROM")]
             )
-            if pmr_magic_value[0] != MAGIC_VALUE:
-                logger.info("This Paper Mario ROM is invalid.")
+            if (    pmr_magic_value[0] != MAGIC_VALUE
+                and pmr_magic_value[0] != MAGIC_VALUE.to_bytes(4, "big")
+            ):
+                logger.info(f"This Paper Mario ROM is invalid. {hex(pmr_magic_value[0])}")
                 return False
 
         except UnicodeDecodeError:
@@ -105,36 +107,60 @@ class PaperMarioClient(BizHawkClient):
                 # RECEIVE ITEMS
                 # Add item to buffer as u16 int
                 if received_items < len(ctx.items_received):
-                    next_item = ctx.items_received[received_items]
+                    new_items: List[NetworkItem] = ctx.items_received[received_items:]
+                    if len(new_items) > MAX_ITEMS_RECEIVED_AT_ONCE:
+                        new_items = new_items[:MAX_ITEMS_RECEIVED_AT_ONCE]
 
-                    # check what id actually needs sent to the game, as some
-                    # items have multiples
-                    # items in the player's game will have the biggest available
-                    # ID, when receiving we give the smallest
-                    item_id = next_item.item - item_id_prefix
-                    if item_id in item_multiples_ids.keys():
-                        repeat_id = 0
+                    new_items_ids: List[int] = [x.item - item_id_prefix for x in new_items]
 
-                        # magical seeds need to skip seed 1 if only 3 seeds
-                        # required, 1 and 2 if 2 seeds required, etc
-                        if item_id == item_table["Magical Seed"][2]:
-                            repeat_id = min(
-                                4 - ctx.slot_data["magical_seeds"],
-                                3 # maximum of 3 in case command used
-                            )
+                    # Since we can have the exact same item id of "item_multiples_ids" items
+                    # in the new_items_ids list, we have to keep track of the repeat_id
+                    # of each of them. If didn't do this, we might add the same
+                    # repeat-version of an item, leading to e.g. sending multiple
+                    # "RuinsKeyA"s despite wanting to send one "RuinsKeyA",
+                    # one "RuinsKeyB" and so on
+                    same_item_in_received_items: Dict[int, int] = {}
 
-                        base_item_id = item_id
-                        item_id = item_multiples_ids[base_item_id][repeat_id]
-                        while (    repeat_id < len(item_multiples_ids[base_item_id])
-                               and uir_flags[item_id]
-                        ):
+                    for i, item_id in enumerate(new_items_ids):
+                        # check what id actually needs sent to the game, as some
+                        # items have multiples
+                        # items in the player's game will have the biggest available
+                        # ID, when receiving we give the smallest
+                        if item_id in item_multiples_ids.keys():
+                            if item_id in same_item_in_received_items:
+                                repeat_id = same_item_in_received_items[item_id] + 1
+                            else:
+                                repeat_id = 0
+
+                            # magical seeds need to skip seed 1 if only 3 seeds
+                            # required, 1 and 2 if 2 seeds required, etc
+                            if item_id == item_table["Magical Seed"][2]:
+                                repeat_id = min(
+                                    4 - ctx.slot_data["magical_seeds"],
+                                    3 # maximum of 3 in case command used
+                                )
+
+                            base_item_id = item_id
                             item_id = item_multiples_ids[base_item_id][repeat_id]
-                            repeat_id += 1
+                            while (    repeat_id < len(item_multiples_ids[base_item_id])
+                                   and uir_flags[item_id]
+                            ):
+                                repeat_id += 1
 
-                    item_id = item_id << 16
+                            # overwrite item id in list with adjusted id
+                            same_item_in_received_items[item_id] = repeat_id
+                            new_items_ids[i] = item_multiples_ids[base_item_id][repeat_id]
+
+                    # bizhawk wants the data to write as a byte array here,
+                    # but `new_items_ids` is a list of halfwords.
+                    new_items_ids_as_bytes: List[int] = []
+                    for x in new_items_ids:
+                        new_items_ids_as_bytes.append((x & 0xFF00) >> 8)
+                        new_items_ids_as_bytes.append(x & 0xFF)
+
                     await bizhawk.guarded_write(
                         ctx.bizhawk_ctx,
-                        [(KEY_RECV_BUFFER, item_id.to_bytes(4, "big"), "RDRAM")],
+                        [(KEY_RECV_BUFFER, new_items_ids_as_bytes, "RDRAM")],
                         [
                             (KEY_RECV_BUFFER, (0).to_bytes(4, "big"), "RDRAM"),
                             (ITM_RCV_SEQ, read_state[3], "RDRAM")

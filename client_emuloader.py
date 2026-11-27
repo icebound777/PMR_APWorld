@@ -34,7 +34,6 @@ from .Locations import location_name_to_id
 from .items import item_id_prefix
 
 
-MAX_ITEMS_RECEIVED_AT_ONCE: int = 128
 SIGNATURE_OFFSET = SIGNATURE_OFFSET_DEV
 
 
@@ -259,7 +258,6 @@ async def game_watcher(ctx: PaperMarioContext):
             if len(new_items) > MAX_ITEMS_RECEIVED_AT_ONCE:
                 new_items = new_items[:MAX_ITEMS_RECEIVED_AT_ONCE]
 
-
             new_items_ids: List[int] = [x.item - item_id_prefix for x in new_items]
 
             # Since we can have the exact same item id of "item_multiples_ids" items
@@ -271,6 +269,10 @@ async def game_watcher(ctx: PaperMarioContext):
             same_item_in_received_items: Dict[int, int] = {}
 
             for i, item_id in enumerate(new_items_ids):
+                # check what id actually needs sent to the game, as some
+                # items have multiples
+                # items in the player's game will have the biggest available
+                # ID, when receiving we give the smallest
                 if item_id in item_multiples_ids.keys():
                     if item_id in same_item_in_received_items:
                         repeat_id = same_item_in_received_items[item_id] + 1
