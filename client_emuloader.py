@@ -127,7 +127,7 @@ class PaperMarioContext(CommonContext):
         class PaperMarioManager(GameManager):
             ctx: PaperMarioContext
             logging_pairs = [("Client", "Archipelago")]
-            base_title = "Paper Mario Client for AP"
+            base_title = "Paper Mario Client (0.7.0) for AP"
 
             def build(self):
                 return super().build()

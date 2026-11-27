@@ -2,27 +2,14 @@
 
 ## Required Software
 
-- [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) v0.5.1 or higher. Make sure to install the
-  Generator. You will not be able to generate games with Paper Mario on the Archipelago site, only locally.
+- [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases) v0.5.1 or higher. Make sure to install the Generator. You will not be able to generate games with Paper Mario on the Archipelago site, only locally.
 - [The Paper Mario AP World](https://github.com/icebound777/PMR_APWorld/). To download it, go to the [latest release](https://github.com/icebound777/PMR_APWorld/releases) and download the papermario.apworld file.
 - A legally obtained US 1.0 Paper Mario ROM.
 - Emulator
-  - [BizHawk](https://tasvideos.org/BizHawk/ReleaseHistory) 2.7 to 2.9.1; **2.10's release does not work**, 2.11 or newer.
-  - or [Luna's Project64](https://github.com/Luna-Project64/Luna-Project64/releases)
-
-## Emulator setup for Luna's Project64
-
-If you want to try using the Luna's Project64 emulator instead of bizhawk, then in addition to the emulator itself you'll need to do the following:
-
-1. Get the lua connector script from the sm64 hacks ap github, only the `connector_pj64_generic.js` file is needed: [SM64 Hacks AP Github](https://github.com/DNVIC/archipelago-sm64hacks/releases). After downloading it, place it in `%appdata%/Luna-Project64/Scripts/` (first create the `Scripts` directory if it does not exist already)
-2. Setup your PM64 game such that you have a .z64 file with the patch applied
-3. In the Luna's PJ64 settings, you need to change:
-    - Options dropdown -> click Configuration -> go to Advanced on the left -> check "Always use interpreter core"
-    - Options dropdown -> graphics settings -> Frame buffer tab -> check Emulate frame buffer
-4. Load the pm64 rando rom and open the generic bizhawk client from the AP side
-5. In Luna's PJ64 go to the Debugger drop down and enable the debugger, then go back to the Debugger drop down and open the scripts menu. Inside the scripts menu you'll want to double click the `connector_pj64_generic.js` script so that the `-` turns into a `>`, and that means the script is running
-
-(Note for unix users: This _does_ work when run through Steam's Proton compatability layer)
+  - For a list of supported emulators, see [emu_loader's readme](https://github.com/Killklli/EmuLoader/)
+  - alternatively, you can use the old, legacy connection with one of these emulators:
+    - [BizHawk](https://tasvideos.org/BizHawk/ReleaseHistory) 2.7 to 2.9.1; **2.10's release does not work**, 2.11 or newer.
+    - or [Luna's Project64](https://github.com/Luna-Project64/Luna-Project64/releases)
 
 ## Add the Paper Mario AP World to your Archipelago install
 
@@ -67,9 +54,45 @@ Follow [the general Archipelago instructions](https://archipelago.gg/tutorial/Ar
 ## Connecting to an Archipelago Server
 
 1. Obtain your .appm64 file from whoever is hosting the game. These files will not upload to the website even if it is hosted there, so you will have to send/receive them elsewhere.
+2. Once you have obtained your .appm64 patch file, open up ArchipelagoLauncher.exe from the base Archipelago folder and click "Open Patch". In the prompt that comes up, choose your .appm64 file. If this is your first time opening the patch file, you will be prompted to locate your vanilla ROM. A patched .z64 file will be created in the same place as the patch file.
+3. The Paper Mario Client should now open automatically. At this point you need to connect by entering your room's address and port (e.g. archipelago.gg:38281) into the top text field of the client and click Connect.
+4. If the client prompts you to enter your slot name, do so now.
+5. Open your emulator of choice, and load up the patched .z64 created in step 2.
+
+You should now be able to receive and send items. You'll need to do these steps every time you want to reconnect. It is perfectly safe to make progress offline; everything will re-sync when you reconnect.
+
+Note: After the first time you open an .appm64 file through the Archipelago Launcher, it should associate that file type with the launcher and all you should have to do is double click them.
+
+## Legacy Connection to emulators
+
+If your prefer to not use the new Paper Mario Client, then you can still use the old method of connecting to bizhawk / Luna's PJ64 as outlined below.
+
+To not auto-start the new Paper Mario Client, set the `client_start` setting in the `host.yaml` file to `false`. You will have to manually start the bizhawk client, however.
+
+## Connecting to an Archipelago Server (legacy)
+
+Skip this step if you're not using the legacy connection.
+
+1. Obtain your .appm64 file from whoever is hosting the game. These files will not upload to the website even if it is hosted there, so you will have to send/receive them elsewhere.
 2. Once you have obtained your .appm64 patch file, open up ArchipelagoLauncher.exe from the base Archipelago folder and click "Open Patch". In the prompt that comes up, choose your .appm64 file. If this is your first time opening the patch file, you will be prompted to locate your vanilla ROM. You will also be prompted to locate your BizHawk client, which is named EmuHawk.exe in your BizHawk install. A patched .z64 file will be created in the same place as the patch file.
 3. Once the patch file has been created, BizHawk should start up automatically with the patched ROM. The Generic BizHawk Client for Archipelago will also open, as well as a Lua Console window. At this point all you need to do to connect is enter your room's address and port (e.g. archipelago.gg:38281) into the top text field of the client and click Connect.
 
 You should now be able to receive and send items. You'll need to do these steps every time you want to reconnect. It is perfectly safe to make progress offline; everything will re-sync when you reconnect.
 
 Note: After the first time you open an .appm64 file through the Archipelago Launcher, it should associate that file type with the launcher and all you should have to do is double click them.
+
+## Emulator setup for Luna's Project64 (legacy)
+
+Skip this step if you're not using the legacy connection.
+
+If you want to try using the Luna's Project64 emulator instead of bizhawk, then in addition to the emulator itself you'll need to do the following:
+
+1. Get the lua connector script from the sm64 hacks ap github, only the `connector_pj64_generic.js` file is needed: [SM64 Hacks AP Github](https://github.com/DNVIC/archipelago-sm64hacks/releases). After downloading it, place it in `%appdata%/Luna-Project64/Scripts/` (first create the `Scripts` directory if it does not exist already)
+2. Setup your PM64 game such that you have a .z64 file with the patch applied
+3. In the Luna's PJ64 settings, you need to change:
+    - Options dropdown -> click Configuration -> go to Advanced on the left -> check "Always use interpreter core"
+    - Options dropdown -> graphics settings -> Frame buffer tab -> check Emulate frame buffer
+4. Load the pm64 rando rom and open the generic bizhawk client from the AP side
+5. In Luna's PJ64 go to the Debugger drop down and enable the debugger, then go back to the Debugger drop down and open the scripts menu. Inside the scripts menu you'll want to double click the `connector_pj64_generic.js` script so that the `-` turns into a `>`, and that means the script is running
+
+(Note for unix users: This _does_ work when run through Steam's Proton compatability layer)
