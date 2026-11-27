@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class PaperMarioClient(BizHawkClient):
     game = "Paper Mario"
     system = "N64"
-    patch_suffix = ".appm64"
+    # patch_suffix = ".appm64" # gen bizhawk not as priority client for this apworld
     local_checked_locations: Set[int]
 
     current_area_id: Optional[int]

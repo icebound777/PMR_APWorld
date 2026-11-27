@@ -14,6 +14,7 @@ from NetUtils import (
     NetworkItem,
 )
 import Patch
+from settings import get_settings
 import Utils
 
 # run archipelago's module update to fetch emu_loader via requirements.txt
@@ -416,6 +417,8 @@ def main(*launch_args: str):
         metadata = _patch_game(args.patch_file)
         if metadata is not None and "server" in metadata:
             args.connect = metadata["server"]
+        if not get_settings().paper_mario_settings.client_start:
+            return
 
     async def _main():
         multiprocessing.freeze_support()
