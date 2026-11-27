@@ -202,7 +202,9 @@ async def game_watcher(ctx: PaperMarioContext):
         return u8_list
 
     def write_list_u16(client: PaperMarioEmuLoaderClient, address: int, u16_list: List[int]):
-        for i, u16_val in enumerate(u16_list):
+        enumerated_u16_list = list(enumerate(u16_list))
+        enumerated_u16_list.reverse()
+        for i, u16_val in enumerated_u16_list:
             #print(f"Writing {hex(u16_val)} to {hex(address + 0x80000000 + (2*i))}")
             client.write_u16(address + 0x80000000 + (2*i), u16_val)
 
