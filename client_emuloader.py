@@ -60,6 +60,9 @@ def rom_is_ready_for_communication(client: EmuLoaderClient) -> bool:
 
 
 class PaperMarioGameState():
+    """
+    Game-specific game state tracking.
+    """
     local_checked_locations: Set[int]
     autohint_stored: Set[int]
     autohint_released: Set[int]
@@ -193,6 +196,12 @@ async def emu_loader_monitor_task(ctx: PaperMarioContext):
 
 
 async def game_watcher(ctx: PaperMarioContext):
+    """
+    The game_watcher is the per tick game logic.
+    Here we check if it's save to read and write data (by checking for the
+    game mode), and if so we bounce tracker data, receive and send items,
+    handle auto-hints, and check if the player has reached their goal.
+    """
     def read_list_u8(client: PaperMarioEmuLoaderClient, address: int, count: int = 1) -> List[int]:
         u8_list: List[int] = []
 
@@ -202,6 +211,10 @@ async def game_watcher(ctx: PaperMarioContext):
         return u8_list
 
     def write_list_u16(client: PaperMarioEmuLoaderClient, address: int, u16_list: List[int]):
+        # we write the list back-to-front, as this function is only used for receiving items,
+        # and the receiving items array in the game's RAM is guaranteed to be empty.
+        # Since the trigger for ROM to start working through the list is list[0] being
+        # non-zero, we write that specific u16 last
         enumerated_u16_list = list(enumerate(u16_list))
         enumerated_u16_list.reverse()
         for i, u16_val in enumerated_u16_list:
@@ -392,6 +405,9 @@ async def game_watcher(ctx: PaperMarioContext):
 
 
 def _patch_game(patch_file: str) -> Patch.RomMeta | None:
+    """
+    Patches the ROM
+    """
     try:
         metadata, _ = Patch.create_rom_file(patch_file)
         #Utils.async_start(_run_game(output_file))
@@ -403,6 +419,11 @@ def _patch_game(patch_file: str) -> Patch.RomMeta | None:
 
 
 def main(*launch_args: str):
+    """
+    Entry-point for the Paper Mario Client that's based on emu_loader.
+    Patches the ROM if required, then waits for a valid randomized PMR ROM
+    to be found in any of the supported emulators.
+    """
     Utils.init_logging("Paper Mario Client")
     parser = get_base_parser()
     parser.add_argument(
@@ -422,6 +443,10 @@ def main(*launch_args: str):
         if metadata is not None and "server" in metadata:
             args.connect = metadata["server"]
         if not get_settings().paper_mario_settings.client_start:
+            # If the client_start setting is turned off (meaning the user
+            # does _not_ want to use the PMClient but rather the generic
+            # bizhawk one), and we're currently in the `Open Patch` context,
+            # then abort here after patching.
             return
 
     async def _main():
