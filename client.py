@@ -141,9 +141,8 @@ class PaperMarioClient(BizHawkClient):
                                 )
 
                             base_item_id = item_id
-                            item_id = item_multiples_ids[base_item_id][repeat_id]
                             while (    repeat_id < len(item_multiples_ids[base_item_id])
-                                   and uir_flags[item_id]
+                                    and uir_flags[item_multiples_ids[base_item_id][repeat_id]]
                             ):
                                 repeat_id += 1
 
