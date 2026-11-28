@@ -63,9 +63,7 @@ class PaperMarioClient(BizHawkClient):
                 ctx.bizhawk_ctx,
                 [(TABLE_ADDRESS, 0x4, "ROM")]
             )
-            if (    pmr_magic_value[0] != MAGIC_VALUE
-                and pmr_magic_value[0] != MAGIC_VALUE.to_bytes(4, "big")
-            ):
+            if pmr_magic_value[0] != MAGIC_VALUE.to_bytes(4, "big"):
                 logger.info(f"This Paper Mario ROM is invalid. {hex(pmr_magic_value[0])}")
                 return False
 
