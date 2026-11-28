@@ -15,6 +15,7 @@
   * Implements the [emu_loader](https://github.com/Killklli/EmuLoader/) library into a new custom client, which allows this apworld to support many different emulators now.
   * Continuing to support the generic bizhawk client as well, if you prefer using that client instead
   * The setup guide has been updated with information on this.
+  * Note that this new client currently cannot auto-connect, unlike the bizhawk client. So the user will be prompted for their archipelago slot name on every connect.
 * New `client_start` world setting (host.yaml)
   * `true`: When using Archipelago's `Open Patch` functionality, then patch the ROM and open the Paper Mario Client
   * `false` When using Archipelago's `Open Patch` functionality, only patch the ROM, but do not open the Paper Mario Client. This is intended for those who want to use a different client, like the generic bizhawk one.
