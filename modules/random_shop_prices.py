@@ -82,6 +82,9 @@ def get_shop_price(node: PMLocation,
                 if (buy_price - (buy_price % 5)) != 0:
                     buy_price = round(buy_price / 5) * 5
 
+            elif item.name == "Coin Bag":
+                buy_price = 10
+
             elif item_type in ["BADGE", "KEYITEM", "PARTNER", "GEAR", "PARTNERUPGRADE", "OTHER"]:
                 buy_price = random.choice([10, 15, 20, 25, 30])
 
@@ -92,9 +95,6 @@ def get_shop_price(node: PMLocation,
                     buy_price = random.choice([5, 10, 15, 20])
                 else:
                     buy_price = random.choice([5, 10])
-
-            elif item.name == "Coin Bag":
-                buy_price = 10
 
             elif item_type == "COIN":
                 buy_price = 1

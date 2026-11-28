@@ -1,2 +1,6 @@
 # Ignore compiled python files
 *.pyc
+
+# vendored emu-loader sources, extracted from a built python wheel
+emu_loader/
+emu_loader-0.1.4.dist-info/

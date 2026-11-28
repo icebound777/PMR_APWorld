@@ -1035,7 +1035,11 @@ class CoinColorPalette(Choice):
 
 
 class RandomText(Toggle):
-    """When enabled, all text in the game will be randomized."""
+    """
+    When enabled, all text in the game will be randomized. This is NOT a
+    dialogue shuffle, instead this setting randomizes each letter individually,
+    turning the game's text into gibberish.
+    """
     display_name = "Random Text"
 
 

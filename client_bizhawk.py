@@ -1,14 +1,33 @@
-from typing import TYPE_CHECKING, Set, Optional, Tuple
+from typing import TYPE_CHECKING, Set, Optional, Tuple, List, Dict
 import base64
 
-from NetUtils import ClientStatus
+from NetUtils import ClientStatus, NetworkItem
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
-from .data.ItemList import item_multiples_ids
-from .data.data import *
-from .Locations import location_name_to_id
-from .items import item_id_prefix
-from .data.LocationsList import location_groups, location_table
+
+from .client_common import (
+    get_new_autohints,
+    get_newly_checked_item_locations,
+    get_receive_items_list,
+)
+from .data.data import (
+    AUTH_ADDRESS,
+    AREA_ADDRESS,
+    GAME_MODE_WORLD,
+    GF_START_ADDRESS,
+    GOAL_FLAG,
+    ITM_RCV_SEQ,
+    KEY_RECV_BUFFER,
+    MAGIC_VALUE,
+    MAP_ADDRESS,
+    MF_START_ADDRESS,
+    MODE_ADDRESS,
+    STAR_SPIRITS_COUNT,
+    TABLE_ADDRESS,
+    UIR_START_ADDRESS,
+    get_flag_value,
+    item_table,
+)
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
@@ -17,7 +36,7 @@ if TYPE_CHECKING:
 class PaperMarioClient(BizHawkClient):
     game = "Paper Mario"
     system = "N64"
-    patch_suffix = ".appm64"
+    # patch_suffix = ".appm64" # gen bizhawk not as priority client for this apworld
     local_checked_locations: Set[int]
 
     current_area_id: Optional[int]
@@ -44,8 +63,8 @@ class PaperMarioClient(BizHawkClient):
                 ctx.bizhawk_ctx,
                 [(TABLE_ADDRESS, 0x4, "ROM")]
             )
-            if pmr_magic_value[0] != MAGIC_VALUE:
-                logger.info("This Paper Mario ROM is invalid.")
+            if pmr_magic_value[0] != MAGIC_VALUE.to_bytes(4, "big"):
+                logger.info(f"This Paper Mario ROM is invalid. {hex(pmr_magic_value[0])}")
                 return False
 
         except UnicodeDecodeError:
@@ -105,36 +124,22 @@ class PaperMarioClient(BizHawkClient):
                 # RECEIVE ITEMS
                 # Add item to buffer as u16 int
                 if received_items < len(ctx.items_received):
-                    next_item = ctx.items_received[received_items]
+                    new_items_ids = get_receive_items_list(
+                        ctx = ctx,
+                        count_received_items = received_items,
+                        uir_flags = uir_flags,
+                    )
 
-                    # check what id actually needs sent to the game, as some
-                    # items have multiples
-                    # items in the player's game will have the biggest available
-                    # ID, when receiving we give the smallest
-                    item_id = next_item.item - item_id_prefix
-                    if item_id in item_multiples_ids.keys():
-                        repeat_id = 0
+                    # bizhawk wants the data to write as a byte array here,
+                    # but `new_items_ids` is a list of halfwords.
+                    new_items_ids_as_bytes: List[int] = []
+                    for x in new_items_ids:
+                        new_items_ids_as_bytes.append((x & 0xFF00) >> 8)
+                        new_items_ids_as_bytes.append(x & 0xFF)
 
-                        # magical seeds need to skip seed 1 if only 3 seeds
-                        # required, 1 and 2 if 2 seeds required, etc
-                        if item_id == item_table["Magical Seed"][2]:
-                            repeat_id = min(
-                                4 - ctx.slot_data["magical_seeds"],
-                                3 # maximum of 3 in case command used
-                            )
-
-                        base_item_id = item_id
-                        item_id = item_multiples_ids[base_item_id][repeat_id]
-                        while (    repeat_id < len(item_multiples_ids[base_item_id])
-                               and uir_flags[item_id]
-                        ):
-                            item_id = item_multiples_ids[base_item_id][repeat_id]
-                            repeat_id += 1
-
-                    item_id = item_id << 16
                     await bizhawk.guarded_write(
                         ctx.bizhawk_ctx,
-                        [(KEY_RECV_BUFFER, item_id.to_bytes(4, "big"), "RDRAM")],
+                        [(KEY_RECV_BUFFER, new_items_ids_as_bytes, "RDRAM")],
                         [
                             (KEY_RECV_BUFFER, (0).to_bytes(4, "big"), "RDRAM"),
                             (ITM_RCV_SEQ, read_state[3], "RDRAM")
@@ -143,22 +148,11 @@ class PaperMarioClient(BizHawkClient):
                 # SEND ITEMS
                 mf_bytes = bytearray(mod_flags)
                 gf_bytes = bytearray(game_flags)
-                locs_to_send = set()
-
-                # check through the checks table for checked checks
-                for location, data in checks_table.items():
-                    loc_id = location_name_to_id[location]
-                    loc_val = False
-
-                    # these flags are weird and require a helper function to do
-                    # funny math, refer to doc linked in data
-                    if data[0] == "MF":
-                        loc_val = get_flag_value(data[1], mf_bytes)
-                    elif data[0] == "GF":
-                        loc_val = get_flag_value(data[1], gf_bytes)
-
-                    if loc_val and loc_id in ctx.server_locations:
-                        locs_to_send.add(loc_id)
+                locs_to_send: Set[int] = get_newly_checked_item_locations(
+                    ctx = ctx,
+                    modflag_bytes = mf_bytes,
+                    gameflag_bytes = gf_bytes,
+                )
 
                 # Send locations if there are any to send
                 if locs_to_send != self.local_checked_locations:
@@ -172,23 +166,14 @@ class PaperMarioClient(BizHawkClient):
 
                 # AUTO HINTING
                 # Build list of items to scout
-                hints = []
-                for loc in location_groups["AutoHint"]:
-                    if loc not in self.autohint_released.union(self.autohint_stored):
-                        if current_location == (location_table[loc][2], location_table[loc][3]):
-                            # don't hint Rowf items you can't see/buy yet
-                            if (location_table[loc][2], location_table[loc][3]) == (1, 2):
-                                # grab the set number from the location name
-                                rowf_set = int(loc[len("TT Plaza District Rowf's Shop Set ")])
-                                if rowf_set <= star_spirits + 1:
-                                    hints.append(loc)
-                            else:
-                                hints.append(loc)
-
-                # make sure we aren't scouting anything that's already been checked
-                hints = [location_name_to_id[loc] for loc in hints if
-                         location_name_to_id[loc] in ctx.missing_locations and
-                         location_name_to_id[loc] not in ctx.locations_checked]
+                hints: List[int] = get_new_autohints(
+                    ctx = ctx,
+                    current_location = current_location,
+                    current_star_spirits = star_spirits,
+                    already_handled_autohints = self.autohint_released.union(
+                        self.autohint_stored
+                    ),
+                )
 
                 # scout the auto hint locations in the current area and store
                 # what we have scouted but not hinted

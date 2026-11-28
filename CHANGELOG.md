@@ -1,8 +1,32 @@
 # Changelog
 
-## 0.6.10
+## 0.7.0
 
 ### Bugfixes/Corrections
+
+* Shop prices
+  * Fix `Coin Bag` items, which give 10 coins, being sold for anywhere from 10 to 30 coins. Now they always cost exactly 10 coins.
+* Item check flags
+  * Fix `Boo's Mansion - BM Super Boots Room In Big Chest` triggering as checked when opening the chest itself. The check is intended to only trigger once the boo ring minigame has concluded.
+
+### Other
+
+* New `Paper Mario Client`
+  * Implements the [emu_loader](https://github.com/Killklli/EmuLoader/) library into a new custom client, which allows this apworld to support many different emulators now.
+  * Continuing to support the generic bizhawk client as well, if you prefer using that client instead
+  * The setup guide has been updated with information on this.
+  * Note that this new client currently cannot auto-connect, unlike the bizhawk client. So the user will be prompted for their archipelago slot name on every connect.
+* New `client_start` world setting (host.yaml)
+  * `true`: When using Archipelago's `Open Patch` functionality, then patch the ROM and open the Paper Mario Client
+  * `false` When using Archipelago's `Open Patch` functionality, only patch the ROM, but do not open the Paper Mario Client. This is intended for those who want to use a different client, like the generic bizhawk one.
+* Item receiving
+  * Slightly sped up item receiving, so reconnecting into an async session now only takes "long" instead of "almost forever" to receive all new items. This is going to be sped up further in future releases.
+* YAML options
+  * The description for `Random Text` now explains that it turns the text into gibberish, instead of shuffling dialogue.
+
+## 0.6.10
+
+### Bugfixes/Corrections (0.6.10)
 
 * `Open Forever Forest` option
   * Fix broken seed generation when this option was turned on.

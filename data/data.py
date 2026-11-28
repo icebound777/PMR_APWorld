@@ -33,8 +33,11 @@ TABLE_ADDRESS = 0x1D00000
 AUTH_ADDRESS = 0x1D00000 - 16
 
 # ROM and RAM values
-MAGIC_VALUE = b'PMDB'
+MAGIC_VALUE = 0x504D4442 # b'PMDB'
 GAME_MODE_WORLD = 4
+SIGNATURE_OFFSET_PROD = 0x446470
+SIGNATURE_OFFSET_DEV = 0x477050
+MAX_ITEMS_RECEIVED_AT_ONCE: int = 128
 
 
 def get_uir_address(name):
@@ -581,7 +584,7 @@ checks_table = {
     "BM Basement Shop Item 5":                                   ("MF",   0x105F),
     "BM Basement Shop Item 6":                                   ("MF",   0x1060),
 
-    "BM Super Boots Room In Big Chest":                          ("GF",   0x3C7),
+    "BM Super Boots Room In Big Chest":                          ("MF",   0x35),
     "BM Super Boots Room In Crate":                              ("GF",   0x3CA),
     "BM Super Boots Room Hidden Panel":                          ("GF",   0x3CC),
 
