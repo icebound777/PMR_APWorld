@@ -11,6 +11,7 @@ from .client_common import (
     get_receive_items_list,
 )
 from .data.data import (
+    AUTH_ADDRESS,
     AREA_ADDRESS,
     GAME_MODE_WORLD,
     GF_START_ADDRESS,
@@ -22,6 +23,7 @@ from .data.data import (
     MF_START_ADDRESS,
     MODE_ADDRESS,
     STAR_SPIRITS_COUNT,
+    TABLE_ADDRESS,
     UIR_START_ADDRESS,
     get_flag_value,
     item_table,
